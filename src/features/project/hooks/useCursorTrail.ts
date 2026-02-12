@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-const TRAIL_LENGTH = 20;
+const TRAIL_LENGTH = 2;
 
 const useCursorTrail = () => {
   // --------------------------- Refs ---------------------------

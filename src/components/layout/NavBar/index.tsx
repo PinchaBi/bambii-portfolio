@@ -1,15 +1,18 @@
-import { menus } from "./constants";
-import NavBarItem from "../NavBarItem";
-import ContactButton from "../ContactButton";
-import BambiiLogo from "@/components/ui/BambiiLogo";
-import { AppBar, Stack, Toolbar } from "@mui/material";
 import { useEffect, useState } from "react";
+
+import { AppBar, Stack, Toolbar } from "@mui/material";
+
+import BambiiLogo from "@/components/ui/BambiiLogo";
+
+import ContactButton from "../ContactButton";
+import NavBarItem from "../NavBarItem";
+import { menus } from "./constants";
 
 const NavBar = () => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
 
-  const [hasBorder, setHasBorder] = useState(true); // Default to true since we start at ProjectView
+  const [hasBorder, setHasBorder] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,19 +24,8 @@ const NavBar = () => {
       const projectRect = projectSection.getBoundingClientRect();
       const contactRect = contactSection.getBoundingClientRect();
 
-      // Check if sections are in viewport (rough check: top < windowHeight/2 and bottom > 0)
-      // Or simply: if we are overlapping with them.
-      // Since they occupy full viewport height mostly, if their top is <= half screen and bottom >= half screen?
-      // "Pass ProjectView" -> In ActivityView.
-
-      console.log(projectRect.top, projectRect.bottom, contactRect.bottom, window.innerHeight);
-
-      const inProjectView = projectRect.bottom > 20 && projectRect.top < -20; // Still visible or mostly visible
-      const inContactView = contactRect.bottom < window.innerHeight + 65; // Entering/Visible
-
-      // Logic interpretation: "When it pass ProjectView and ContactView"
-      // Likely means: When in ProjectView OR ContactView -> White Border.
-      // When in ActivityView (between them) -> No Border.
+      const inProjectView = projectRect.bottom > 20;
+      const inContactView = contactRect.bottom < window.innerHeight + 65;
 
       if (inProjectView || inContactView) {
         setHasBorder(true);
@@ -43,7 +35,7 @@ const NavBar = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Initial check
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 

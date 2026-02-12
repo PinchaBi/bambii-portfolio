@@ -1,0 +1,1 @@
+export const ITEM_AMOUNT_INSTRAGRAM = 8;

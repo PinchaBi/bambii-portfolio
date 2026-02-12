@@ -6,14 +6,17 @@ import type { ProjectCardType } from "./components/ProjectCard/types";
 export const projectList: ProjectCardType[] = [
   {
     title: "Branding",
+    path: "branding",
     image: "/images/project/branding-default.png",
   },
   {
     title: "Web design",
+    path: "web-design",
     image: "/images/project/web-design-default.png",
   },
   {
     title: "Illustration & Product design",
+    path: "/illustration",
     image: "/images/project/illustration-and-product-design-default.png",
   },
 ];
@@ -21,14 +24,17 @@ export const projectList: ProjectCardType[] = [
 export const projectActiveList: ProjectCardType[] = [
   {
     title: "Branding",
+    path: "branding",
     image: "/images/project/branding-active.png",
   },
   {
     title: "Web design",
+    path: "web-design",
     image: "/images/project/web-design-active.png",
   },
   {
     title: "Illustration & Product design",
+    path: "/illustration",
     image: "/images/project/illustration-and-product-design-active.png",
   },
 ];

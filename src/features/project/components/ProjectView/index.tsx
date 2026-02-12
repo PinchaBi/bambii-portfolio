@@ -1,8 +1,13 @@
-import ProjectCard from "../ProjectCard";
-import Wrapper from "@/components/layout/Wrapper";
-import useCursorTrail from "../../hooks/useCursorTrail";
+import { Fragment } from "react";
+
 import { Box, Divider, Stack, Typography } from "@mui/material";
+
+import Grainient from "@/components/animate-ui/Grainient";
+import Wrapper from "@/components/layout/Wrapper";
+
 import { projectActiveList, projectList } from "../../constants";
+import useCursorTrail from "../../hooks/useCursorTrail";
+import ProjectCard from "../ProjectCard";
 
 const CONTENT_WIDTH = 1280;
 
@@ -20,16 +25,14 @@ const ProjectView = () => {
       sx={{
         gap: 5,
         zIndex: 1,
-        paddingTop: 5,
         color: "white",
-        bgcolor: "colors.bambiiPink",
       }}
     >
       {/* SVG Defs for Trail */}
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
         <defs>
           <clipPath id="trail-clip">
-            {Array.from({ length: 20 }).map((_, i) => (
+            {Array.from({ length: 2 }).map((_, i) => (
               <circle
                 key={i}
                 ref={(el) => {
@@ -44,19 +47,43 @@ const ProjectView = () => {
         </defs>
       </svg>
 
+      <Grainient
+        color1="#d69fb3"
+        color2="#f13a7d"
+        color3="#ffadca"
+        timeSpeed={0.25}
+        colorBalance={-0.01}
+        warpStrength={1}
+        warpFrequency={5}
+        warpSpeed={2}
+        warpAmplitude={50}
+        blendAngle={0}
+        blendSoftness={0.05}
+        rotationAmount={500}
+        noiseScale={2}
+        grainAmount={0.1}
+        grainScale={2}
+        grainAnimated
+        contrast={1.5}
+        gamma={1}
+        saturation={1}
+        centerX={0}
+        centerY={0}
+        zoom={0.9}
+      />
+
       {/* Title */}
       <Stack
         width="100%"
+        marginTop={20}
         position="relative"
         justifyContent="space-between"
         paddingX={`calc((100vw - ${CONTENT_WIDTH}px) / 2)`}
       >
         <Stack spacing={1.25} textAlign="center">
-          <Typography variant="h1" fontFamily="PlayfairDisplay">
-            My type of work
-          </Typography>
+          <Typography variant="h1">Types of Work</Typography>
           <Typography variant="subtitle1">
-            select what you want to explore
+            Choose a category to explore
           </Typography>
         </Stack>
       </Stack>
@@ -71,7 +98,6 @@ const ProjectView = () => {
           height="100%"
           position="absolute"
           justifyContent="center"
-          bgcolor="colors.bambiiPink"
           paddingX={`calc((100vw - ${CONTENT_WIDTH}px) / 2)`}
         >
           <Box width="100%" height={390} position="relative">
@@ -84,13 +110,8 @@ const ProjectView = () => {
               />
               {projectList.map((item, index) => {
                 return (
-                  <>
-                    <ProjectCard
-                      key={`${index}-${item.title}-${item.image}`}
-                      mode="default"
-                      index={index}
-                      {...item}
-                    />
+                  <Fragment key={`${index}-${item.title}`}>
+                    <ProjectCard mode="default" index={index} {...item} />
                     {index !== projectList.length - 1 && (
                       <Divider
                         flexItem
@@ -98,7 +119,7 @@ const ProjectView = () => {
                         sx={{ border: "1px solid white" }}
                       />
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
               <Divider
@@ -146,13 +167,8 @@ const ProjectView = () => {
               />
               {projectActiveList.map((item, index) => {
                 return (
-                  <>
-                    <ProjectCard
-                      key={`${index}-${item.title}-${item.image}`}
-                      mode="active"
-                      index={index}
-                      {...item}
-                    />
+                  <Fragment key={`${index}-${item.title}`}>
+                    <ProjectCard mode="active" index={index} {...item} />
                     {index !== projectActiveList.length - 1 && (
                       <Divider
                         flexItem
@@ -160,7 +176,7 @@ const ProjectView = () => {
                         sx={{ border: "1px solid transparent" }}
                       />
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
               <Divider

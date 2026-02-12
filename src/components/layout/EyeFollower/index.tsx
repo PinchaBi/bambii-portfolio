@@ -1,5 +1,6 @@
-import { Box } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+
+import { Box } from "@mui/material";
 
 const EyeFollower = () => {
   // --------------------------- Hooks ---------------------------

@@ -1,5 +1,6 @@
 import { Button, type ButtonProps, Typography, Box } from "@mui/material";
 import { motion, type Variants } from "framer-motion";
+import GlassSurface from "@/components/ui/GlassSurface";
 
 interface GlassButtonProps extends ButtonProps {
   borderRadius?: number | string;
@@ -53,24 +54,16 @@ const GlassButton = ({
         padding: "6px 12px",
         color: "text.primary",
         position: "relative",
+        overflow: "hidden", // Ensure glass doesn't overflow
         transition: "all 0.3s ease",
-        minWidth: "fit-content", // Ensure it can shrink/grow
-        // Glass Style
-        backgroundColor: "rgba(255, 255, 255, 0.3)",
-        backgroundImage:
-          "linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0))",
-        backdropFilter: "blur(7px)",
-        boxShadow: "0px 2px 10px rgba(30, 30, 30, 0.1)",
-        borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
-        borderTop: "1px solid rgba(255, 255, 255, 0.8)",
-        borderRight: "1px solid transparent",
-        borderBottom: "1px solid transparent",
+        minWidth: "fit-content",
+        backgroundColor: "transparent",
+        boxShadow: "0px 4px 24px -1px rgba(0, 0, 0, 0.2)",
+        border: "none",
         ...sx,
         "&:hover": {
-          backgroundColor: "rgba(255, 255, 255, 0.4)",
-          boxShadow: "0px 2px 10px rgba(30, 30, 30, 0.15)",
-          border: "1px solid transparent",
-          // Target both Typography and our custom animated text wrapper
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          boxShadow: "0px 8px 32px -1px rgba(0, 0, 0, 0.3)",
           "& .MuiTypography-root, & .glass-text": {
             fontWeight: 500,
             background: "linear-gradient(to bottom, #F13A7D, #777777)",
@@ -83,15 +76,14 @@ const GlassButton = ({
           "&::before": {
             opacity: 1,
           },
-          //   ...(sx as any)?.["&:hover"],
         },
         "&::before": {
           content: '""',
           position: "absolute",
-          inset: -1,
+          inset: 0,
           opacity: 0,
           borderRadius: "inherit",
-          padding: "1.5px",
+          padding: "1.5px", // Border width
           background: "linear-gradient(to bottom, #F13A7D, #777777)",
           mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
           maskComposite: "exclude",
@@ -100,40 +92,61 @@ const GlassButton = ({
           WebkitMaskComposite: "xor",
           pointerEvents: "none",
           transition: "opacity 0.3s ease",
+          zIndex: 2, // Above glass surface
         },
       }}
       {...props}
     >
-      {text ? (
-        <Box display="flex" alignItems="center" gap={0.5}>
-          {icon}
-          <motion.div
-            className="glass-text"
-            style={{ display: "flex", overflow: "hidden" }}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {text.split("").map((char, index) => (
-              <motion.span
-                key={index}
-                variants={childVariants}
-                style={{ display: "inline-block", whiteSpace: "pre" }}
-              >
-                <Typography
-                  variant="overline"
-                  lineHeight="14px"
-                  component="span"
+      <GlassSurface
+        width="100%"
+        height="100%"
+        borderRadius={typeof borderRadius === "number" ? borderRadius : 20}
+        displace={0.5}
+        distortionScale={0}
+        redOffset={0}
+        greenOffset={0}
+        blueOffset={0}
+        brightness={100}
+        opacity={0.9}
+        backgroundOpacity={0.3}
+        mixBlendMode="screen"
+        className="absolute inset-0 pointer-events-none"
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 0 }}
+      />
+
+      {/* Content wrapper to stay above glass */}
+      <Box position="relative" zIndex={1} display="flex" alignItems="center" gap={0.5}>
+        {text ? (
+          <>
+            {icon}
+            <motion.div
+              className="glass-text"
+              style={{ display: "flex", overflow: "hidden" }}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {text.split("").map((char, index) => (
+                <motion.span
+                  key={index}
+                  variants={childVariants}
+                  style={{ display: "inline-block", whiteSpace: "pre" }}
                 >
-                  {char}
-                </Typography>
-              </motion.span>
-            ))}
-          </motion.div>
-        </Box>
-      ) : (
-        children
-      )}
+                  <Typography
+                    variant="overline"
+                    lineHeight="14px"
+                    component="span"
+                  >
+                    {char}
+                  </Typography>
+                </motion.span>
+              ))}
+            </motion.div>
+          </>
+        ) : (
+          children
+        )}
+      </Box>
     </Button>
   );
 };

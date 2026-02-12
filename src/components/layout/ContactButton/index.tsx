@@ -1,4 +1,5 @@
 import { Button, Stack, Typography } from "@mui/material";
+
 import EyeFollower from "../EyeFollower";
 
 type ContactButtonProps = {
@@ -19,9 +20,6 @@ const ContactButton = ({ hasBorder = false }: ContactButtonProps) => {
         padding: "10px 15px",
         transition: "all 0.3s ease",
         border: hasBorder ? "1.5px solid white" : "1.5px solid transparent",
-        // "&:hover": {
-        //   bgcolor: "colors.bambiiPink",
-        // },
       }}
     >
       <Typography variant="button" fontWeight={600}>

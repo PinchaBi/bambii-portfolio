@@ -1,7 +1,8 @@
-import router from "./routes";
-import { RouterProvider } from "react-router-dom";
-import useDisplayStore from "./stores/themeStore";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { RouterProvider } from "react-router-dom";
+
+import router from "./routes";
+import useDisplayStore from "./stores/themeStore";
 
 function App() {
   // --------------------------- Hooks ---------------------------

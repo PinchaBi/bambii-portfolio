@@ -1,3 +1,5 @@
+import { useRef } from "react";
+
 import { INSTRAGRAM_LINK, LINE_LINK, LINKEDIN_LINK } from "@/constants/contact";
 import {
   Box,
@@ -7,8 +9,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import type { SxProps } from "@mui/material";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
-import { useRef } from "react";
 
 const TextFieldSx = {
   width: "100%",
@@ -63,9 +66,14 @@ const LinkBox = ({ url, image, hoverBgColor }: LinkBoxProps) => {
   );
 };
 
-const ContactBox = () => {
+type ContactBoxProps = {
+  sx?: SxProps;
+};
+
+const ContactBox = ({ sx }: ContactBoxProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
+
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
@@ -83,14 +91,16 @@ const ContactBox = () => {
 
   return (
     <Stack
-      top={270}
+      component={motion.div}
+      top={200}
+      left={770}
       width={500}
-      right={170}
       spacing={2.5}
       padding={3.75}
       bgcolor="white"
       borderRadius={5}
       position="absolute"
+      sx={{ ...sx }}
     >
       <Typography variant="h2" fontSize={24}>
         Let’s Talk!
@@ -223,5 +233,6 @@ const ContactBox = () => {
     </Stack>
   );
 };
+ContactBox.displayName = "ContactBox";
 
 export default ContactBox;

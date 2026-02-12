@@ -1,7 +1,8 @@
 import { Box, Stack } from "@mui/material";
-import ProjectView from "@/features/project/components/ProjectView";
-import ContactView from "@/features/contact/components/ContactView";
+
 import ActivityView from "@/features/activity/components/ActivityView";
+import ContactView from "@/features/contact/components/ContactView";
+import ProjectView from "@/features/project/components/ProjectView";
 
 export default function HomePage() {
   // --------------------------- Renders ---------------------------
@@ -9,11 +10,13 @@ export default function HomePage() {
 
   return (
     <Stack>
-      <Box id="project-view">
+      <Box id="project-view" sx={{ position: "relative", top: 0, zIndex: 1 }}>
         <ProjectView />
       </Box>
-      <ActivityView />
-      <Box id="contact-view">
+      <Box id="activity-view" sx={{ position: "sticky", top: 0, zIndex: 2 }}>
+        <ActivityView />
+      </Box>
+      <Box id="contact-view" sx={{ position: "sticky", top: 0, zIndex: 3 }}>
         <ContactView />
       </Box>
     </Stack>

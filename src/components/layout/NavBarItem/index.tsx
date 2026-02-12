@@ -1,4 +1,5 @@
 import { Stack, Typography } from "@mui/material";
+
 import type { NavBarItemType } from "./types";
 
 type NavBarItemProps = NavBarItemType;

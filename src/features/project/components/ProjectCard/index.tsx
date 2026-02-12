@@ -1,6 +1,9 @@
-import { MoveRight } from "lucide-react";
-import { backgroundAvticeList } from "../../constants";
+import { useNavigate } from "react-router-dom";
+
 import { Box, Stack, Typography } from "@mui/material";
+import { MoveRight } from "lucide-react";
+
+import { backgroundAvticeList } from "../../constants";
 import type { ProjectCardType } from "./types";
 
 type ProjectCardProps = ProjectCardType & {
@@ -8,12 +11,25 @@ type ProjectCardProps = ProjectCardType & {
   mode: "default" | "active";
 };
 
-const ProjectCard = ({ index, title, image, mode }: ProjectCardProps) => {
+const ProjectCard = ({ index, title, path, image, mode }: ProjectCardProps) => {
+  // --------------------------- Hooks ---------------------------
+  //region Hooks
+
+  const navigate = useNavigate();
+
+  // --------------------------- Handlers ---------------------------
+  //region Handlers
+
+  const handleNavigate = () => {
+    navigate(path);
+  };
+
   // --------------------------- Renders ---------------------------
   //region Renders
 
   return (
     <Stack
+      onClick={handleNavigate}
       width={425}
       height={390}
       borderRadius={5}

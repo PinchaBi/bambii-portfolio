@@ -1,12 +1,17 @@
 import { useEffect } from "react";
-import CarouselVideo from "./CarouselVideo";
-import useCarousel from "@/hooks/useCarousel";
-import { Box, IconButton, Stack } from "@mui/material";
+
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import useCarousel from "@/hooks/useCarousel";
+
+import GlassSurface from "@/components/ui/GlassSurface";
+
+import CarouselVideo from "./CarouselVideo";
 
 type ImageCarouselProps = {
   images: string[];
-  centerIndex: number;
+  centerIndex?: number;
   parentIndex?: number;
 };
 
@@ -24,8 +29,13 @@ const ImageCarousel = ({
     handleNext,
   } = useCarousel<string>(images);
 
+  const isActive =
+    centerIndex === undefined || parentIndex === undefined
+      ? true
+      : parentIndex === centerIndex;
+
   useEffect(() => {
-    setIndex(0);
+    if (centerIndex !== undefined) setIndex(0);
   }, [centerIndex, setIndex]);
 
   // --------------------------- Renders ---------------------------
@@ -65,7 +75,7 @@ const ImageCarousel = ({
               <CarouselVideo
                 key={`${index}-${image}`}
                 src={image}
-                isActive={index === currentIndex && parentIndex === centerIndex}
+                isActive={index === currentIndex && isActive}
               />
             );
 
@@ -87,68 +97,87 @@ const ImageCarousel = ({
         })}
       </Box>
 
-      {centerIndex === parentIndex && (
-        <Stack
-          className="image-pagination"
-          sx={{
-            inset: 0,
-            top: 123,
-            paddingX: 2,
-            display: "flex",
-            paddingBottom: 1.25,
-            position: "absolute",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
+      <Stack
+        className="image-pagination"
+        sx={{
+          top: 0,
+          inset: 0,
+          paddingX: 2,
+          paddingY: 1.25,
+          display: "flex",
+          position: "absolute",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box
+          zIndex={1}
+          width="100%"
+          height="18px"
+          display="flex"
+          alignItems="center"
+          justifyContent="flex-end"
         >
-          <Stack width="100%" direction="row" justifyContent="space-between">
-            <IconButton
-              onClick={handlePrev}
-              sx={{
-                padding: 1.25,
-                color: "text.primary",
-                transition: "all 0.3s ease",
-                bgcolor: "rgba(255,255,255, 0.50)",
-                "&:hover": { bgcolor: "white" },
-              }}
-            >
-              <ChevronLeft size={24} />
-            </IconButton>
-            <IconButton
-              onClick={handleNext}
-              sx={{
-                padding: 1.25,
-                color: "text.primary",
-                transition: "all 0.3s ease",
-                bgcolor: "rgba(255,255,255, 0.50)",
-                "&:hover": { bgcolor: "white" },
-              }}
-            >
-              <ChevronRight size={24} />
-            </IconButton>
-          </Stack>
-
-          <Box
-            gap={0.5}
-            display="flex"
-            padding="5px 8px"
-            borderRadius={2.5}
+          <Typography
+            color="white"
+            height="18px"
+            variant="subtitle2"
+            borderRadius={3.75}
+            bgcolor="rgba(0, 0, 0, 0.55)"
             sx={{
-              // Glass Style
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              backgroundImage:
-                "linear-gradient(to bottom right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0))",
-              backdropFilter: "blur(7px)",
-              boxShadow: "0px 2px 10px rgba(30, 30, 30, 0.1)",
-              borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
-              borderTop: "1px solid rgba(255, 255, 255, 0.8)",
-              borderRight: "1px solid transparent",
-              borderBottom: "1px solid transparent",
+              px: 1,
             }}
           >
+            {currentIndex + 1}/{images.length}
+          </Typography>
+        </Box>
+
+        <Stack width="100%" direction="row" justifyContent="space-between">
+          <IconButton
+            onClick={handlePrev}
+            sx={{
+              padding: 1.25,
+              color: "text.primary",
+              transition: "all 0.3s ease",
+              bgcolor: "rgba(255,255,255, 0.50)",
+              "&:hover": { bgcolor: "white" },
+            }}
+          >
+            <ChevronLeft size={24} />
+          </IconButton>
+          <IconButton
+            onClick={handleNext}
+            sx={{
+              padding: 1.25,
+              color: "text.primary",
+              transition: "all 0.3s ease",
+              bgcolor: "rgba(255,255,255, 0.50)",
+              "&:hover": { bgcolor: "white" },
+            }}
+          >
+            <ChevronRight size={24} />
+          </IconButton>
+        </Stack>
+
+        <GlassSurface
+          width="fit-content"
+          height="fit-content"
+          borderRadius={20}
+          displace={0.5}
+          distortionScale={-180}
+          redOffset={0}
+          greenOffset={10}
+          blueOffset={20}
+          brightness={100}
+          opacity={0.93}
+          mixBlendMode="screen"
+          style={{ boxShadow: "0px 4px 24px -1px rgba(0, 0, 0, 0.2)" }}
+        >
+          <Box gap={0.5} display="flex">
             {Array.from({ length: images.length }).map((_, index) => {
               return (
                 <Box
+                  key={index}
                   onClick={() => setIndex(index)}
                   sx={{
                     width: 5,
@@ -165,8 +194,8 @@ const ImageCarousel = ({
               );
             })}
           </Box>
-        </Stack>
-      )}
+        </GlassSurface>
+      </Stack>
     </Box>
   );
 };

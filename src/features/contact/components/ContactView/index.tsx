@@ -1,34 +1,58 @@
-import ContactBox from "../ContactBox";
-import { Typography } from "@mui/material";
+import useRevealStore from "@/stores/revealStore";
+import { AnimatePresence, motion } from "framer-motion";
+
+import DotGrid from "@/components/animate-ui/DotGrid";
 import Wrapper from "@/components/layout/Wrapper";
 
-export default function ContactView() {
+import ContactBox from "../ContactBox";
+import ContactTitle from "../ContactTitle";
+
+const ContactView = () => {
+  const isRevealed = useRevealStore((state) => state.isRevealed);
+
+  // --------------------------- Renders ---------------------------
+  //region Renders
+
   return (
     <Wrapper
       sx={{
-        height: "100vh",
         bgcolor: "colors.bambiiBlack",
       }}
     >
-      <Typography
-        top={270}
-        left={170}
-        width={420}
-        variant="h4"
-        fontSize={80}
-        color="white"
-        position="absolute"
-        sx={{
-          ".reality-text": {
-            fontStyle: "italic",
-            color: "colors.lightPink",
-            fontFamily: "PlayfairDisply",
-          },
-        }}
-      >
-        Turn Ideas Into <span className="reality-text">Reality</span>
-      </Typography>
+      <AnimatePresence>
+        {isRevealed && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 3 }}
+            style={{
+              width: "100%",
+              height: "100%",
+              position: "absolute",
+              top: 0,
+              left: 0,
+            }}
+          >
+            <DotGrid
+              dotSize={5}
+              gap={15}
+              baseColor="#381f23"
+              activeColor="#f13a7d"
+              proximity={120}
+              shockRadius={250}
+              shockStrength={5}
+              resistance={750}
+              returnDuration={1.5}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <ContactTitle />
       <ContactBox />
     </Wrapper>
   );
-}
+};
+
+export default ContactView;
