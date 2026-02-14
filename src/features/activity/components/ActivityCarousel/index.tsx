@@ -1,7 +1,9 @@
-import { Box, Stack } from "@mui/material";
-import { activityList } from "../../constants";
 import { ITEM_AMOUNT } from "@/constants/activity";
+import { Box, Stack } from "@mui/material";
+
 import ImageCarousel from "@/components/ui/common/ImageCarousel";
+
+import { activityList } from "../../constants";
 
 type ActivityCarouselProps = {
   centerIndex: number;
@@ -61,38 +63,6 @@ const ActivityCarousel = ({ centerIndex }: ActivityCarouselProps) => {
         );
       })}
 
-      {/* Top Gradient */}
-      <Box
-        width="100%"
-        height={150}
-        zIndex={1000}
-        position="absolute"
-        sx={{
-          pointerEvents: "none",
-          background:
-            "linear-gradient(to bottom, #EEEEEE 20%, rgba(255, 255, 255, 0) 100%)",
-          backdropFilter: "blur(2px)",
-          mask: "linear-gradient(to bottom, black 50%, transparent 100%)",
-          WebkitMask: "linear-gradient(to bottom, black 50%, transparent 100%)",
-        }}
-      />
-
-      {/* Bottom Gradient */}
-      <Box
-        bottom={0}
-        width="100%"
-        height={150}
-        zIndex={1000}
-        position="absolute"
-        sx={{
-          pointerEvents: "none",
-          background:
-            "linear-gradient(to top, #EEEEEE 20%, rgba(255, 255, 255, 0) 100%)",
-          backdropFilter: "blur(2px)",
-          mask: "linear-gradient(to top, black 50%, transparent 100%)",
-          WebkitMask: "linear-gradient(to top, black 50%, transparent 100%)",
-        }}
-      />
     </Stack>
   );
 };

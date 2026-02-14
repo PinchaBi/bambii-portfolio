@@ -5,6 +5,8 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 import useCarousel from "@/hooks/useCarousel";
 
 import Wrapper from "@/components/layout/Wrapper";
+import GradualBlur from "@/components/animate-ui/GradualBlur";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import GlassButton from "@/components/ui/common/GlassButton";
 
 import ActivityCard from "../ActivityCard";
@@ -29,6 +31,7 @@ const ActivityView = () => {
         bgcolor: "colors.bambiiGray",
       }}
     >
+      <BackgroundRippleEffect rows={15} />
       <svg
         width={0}
         height={0}
@@ -39,7 +42,7 @@ const ActivityView = () => {
           <stop offset="100%" stopColor="#777777" />
         </linearGradient>
       </svg>
-      <Stack spacing={7.5} direction="row" height="100%">
+      <Stack spacing={7.5} direction="row" height="100%" position="relative" zIndex={1} sx={{ pointerEvents: "none" }}>
         <Stack
           width={500}
           spacing={1.25}
@@ -68,6 +71,7 @@ const ActivityView = () => {
             onClick={handlePrev}
             borderRadius={6.25}
             sx={{
+              pointerEvents: "auto",
               "&:hover": {
                 "& svg": {
                   stroke: "#F13A7D",
@@ -82,6 +86,7 @@ const ActivityView = () => {
             onClick={handleNext}
             borderRadius={6.25}
             sx={{
+              pointerEvents: "auto",
               "&:hover": {
                 "& svg": {
                   stroke: "#F13A7D",
@@ -93,6 +98,28 @@ const ActivityView = () => {
           </GlassButton>
         </Stack>
       </Stack>
+      <GradualBlur
+        target="parent"
+        position="top"
+        height="8rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+        zIndex={2}
+      />
+      <GradualBlur
+        target="parent"
+        position="bottom"
+        height="8rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+        zIndex={2}
+      />
     </Wrapper>
   );
 };

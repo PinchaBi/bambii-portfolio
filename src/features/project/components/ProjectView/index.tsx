@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import { Box, Divider, Stack, Typography } from "@mui/material";
 
 import Grainient from "@/components/animate-ui/Grainient";
+import ShinyText from "@/components/animate-ui/ShinyText";
 import Wrapper from "@/components/layout/Wrapper";
 
 import { projectActiveList, projectList } from "../../constants";
@@ -82,8 +83,19 @@ const ProjectView = () => {
       >
         <Stack spacing={1.25} textAlign="center">
           <Typography variant="h1">Types of Work</Typography>
-          <Typography variant="subtitle1">
-            Choose a category to explore
+          <Typography variant="h4" fontSize={24}>
+            <ShinyText
+              text="Choose a category to explore"
+              speed={2}
+              delay={0}
+              color="#ffffff"
+              shineColor="#FFD9E7"
+              spread={120}
+              direction="left"
+              yoyo={false}
+              pauseOnHover={false}
+              disabled={false}
+            />
           </Typography>
         </Stack>
       </Stack>

@@ -9,7 +9,11 @@ const InstragramView = () => {
   //region Renders
 
   return (
-    <Wrapper>
+    <Wrapper
+      sx={{
+        height: "90vh",
+      }}
+    >
       <Stack
         spacing={10}
         width="100%"

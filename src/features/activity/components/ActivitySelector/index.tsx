@@ -42,6 +42,7 @@ const ActivitySelector = ({
               sx={{
                 border: "none",
                 cursor: "pointer",
+                pointerEvents: "auto",
                 transition: "all 0.2s ease-in-out",
                 "&:hover": {
                   opacity: 1,

@@ -1,5 +1,7 @@
+import { useCallback, useRef, useState } from "react";
+
 import useRevealStore from "@/stores/revealStore";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 
 import DotGrid from "@/components/animate-ui/DotGrid";
 import Wrapper from "@/components/layout/Wrapper";
@@ -7,14 +9,56 @@ import Wrapper from "@/components/layout/Wrapper";
 import ContactBox from "../ContactBox";
 import ContactTitle from "../ContactTitle";
 
+const CONTACT_BOX_DEFAULT = { x: 770, y: 200 };
+
 const ContactView = () => {
   const isRevealed = useRevealStore((state) => state.isRevealed);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [boxOffset, setBoxOffset] = useState({ x: 0, y: 0 });
+  const [isHoveringBox, setIsHoveringBox] = useState(false);
+  const [isCursorInView, setIsCursorInView] = useState(false);
+
+  // --------------------------- Handlers ---------------------------
+  //region Handlers
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isRevealed || isHoveringBox || !wrapperRef.current) return;
+
+      const rect = wrapperRef.current.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left;
+      const cursorY = e.clientY - rect.top;
+
+      setBoxOffset({
+        x: (cursorX - CONTACT_BOX_DEFAULT.x - 250) * 0.15,
+        y: (cursorY - CONTACT_BOX_DEFAULT.y - 200) * 0.15,
+      });
+    },
+    [isRevealed, isHoveringBox],
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    if (isRevealed) setIsCursorInView(true);
+  }, [isRevealed]);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsCursorInView(false);
+    setBoxOffset({ x: 0, y: 0 });
+  }, []);
+
+  const handleBoxHover = useCallback((hovering: boolean) => {
+    setIsHoveringBox(hovering);
+  }, []);
 
   // --------------------------- Renders ---------------------------
   //region Renders
 
   return (
     <Wrapper
+      ref={wrapperRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       sx={{
         bgcolor: "colors.bambiiBlack",
       }}
@@ -50,7 +94,10 @@ const ContactView = () => {
       </AnimatePresence>
 
       <ContactTitle />
-      <ContactBox />
+      <ContactBox
+        offset={isRevealed && isCursorInView ? boxOffset : { x: 0, y: 0 }}
+        onHoverChange={handleBoxHover}
+      />
     </Wrapper>
   );
 };

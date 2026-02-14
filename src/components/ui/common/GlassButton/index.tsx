@@ -1,5 +1,5 @@
 import { Button, type ButtonProps, Typography, Box } from "@mui/material";
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants } from "motion/react";
 import GlassSurface from "@/components/ui/GlassSurface";
 
 interface GlassButtonProps extends ButtonProps {
@@ -48,6 +48,10 @@ const GlassButton = ({
 
   return (
     <Button
+      component={motion.button}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 400, damping: 15 }}
       sx={{
         gap: 0.5,
         borderRadius: borderRadius,
@@ -55,7 +59,6 @@ const GlassButton = ({
         color: "text.primary",
         position: "relative",
         overflow: "hidden", // Ensure glass doesn't overflow
-        transition: "all 0.3s ease",
         minWidth: "fit-content",
         backgroundColor: "transparent",
         boxShadow: "0px 4px 24px -1px rgba(0, 0, 0, 0.2)",

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import { AppBar, Stack, Toolbar } from "@mui/material";
 
+import GradualBlur from "@/components/animate-ui/GradualBlur";
 import BambiiLogo from "@/components/ui/BambiiLogo";
 
 import ContactButton from "../ContactButton";
@@ -13,6 +14,8 @@ const NavBar = () => {
   //region Hooks
 
   const [hasBorder, setHasBorder] = useState(true);
+  const [isInProjectView, setIsInProjectView] = useState(false);
+  const [isInContactView, setIsInContactView] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +29,9 @@ const NavBar = () => {
 
       const inProjectView = projectRect.bottom > 20;
       const inContactView = contactRect.bottom < window.innerHeight + 65;
+
+      setIsInProjectView(inProjectView);
+      setIsInContactView(inContactView);
 
       if (inProjectView || inContactView) {
         setHasBorder(true);
@@ -50,20 +56,42 @@ const NavBar = () => {
         p: "10px 80px",
         bgcolor: "transparent",
         justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <Toolbar
-        sx={{ padding: "0px !important", justifyContent: "space-between" }}
+        sx={{
+          padding: "0px !important",
+          justifyContent: "space-between",
+          position: "relative",
+          zIndex: 2,
+        }}
       >
-        <BambiiLogo />
+        <BambiiLogo isLight={isInContactView} isInProjectView={isInProjectView} />
         <Stack spacing={1.25} direction="row" paddingRight={2}>
           {menus.map((menu, index) => (
-            <NavBarItem key={`${index}-${menu.name}`} {...menu} />
+            <NavBarItem
+              key={`${index}-${menu.name}`}
+              {...menu}
+              isLight={isInContactView}
+            />
           ))}
         </Stack>
 
         <ContactButton hasBorder={hasBorder} />
       </Toolbar>
+
+      <GradualBlur
+        target="parent"
+        position="top"
+        height="5rem"
+        strength={2}
+        divCount={5}
+        curve="bezier"
+        exponential
+        opacity={1}
+        zIndex={1}
+      />
     </AppBar>
   );
 };

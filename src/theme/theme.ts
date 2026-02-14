@@ -46,11 +46,7 @@ const buildPalette = (mode: PaletteMode): PaletteOptions => ({
 
 const components: Components = {
   MuiCssBaseline: {
-    styleOverrides: {
-      "*, *::before, *::after": {
-        transition: "all 0.2s ease-in-out",
-      },
-    },
+    styleOverrides: {},
   },
   MuiAppBar: {
     styleOverrides: {

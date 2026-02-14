@@ -1,6 +1,7 @@
 import { Box, Stack } from "@mui/material";
 
-import InstragramView from "@/features/branding/components/InstragramView";
+import CUAndTSLView from "@/features/branding/components/CUAndTSLView";
+import MoodView from "@/features/branding/components/MoodView";
 
 export default function BrandingPage() {
   // --------------------------- Renders ---------------------------
@@ -8,10 +9,12 @@ export default function BrandingPage() {
 
   return (
     <Stack>
-      <Box sx={{ position: "relative", top: 0, zIndex: 1 }}>
-        <InstragramView />
+      <Box sx={{ position: "sticky", top: -600, zIndex: 1 }}>
+        <MoodView />
       </Box>
-      <Box sx={{ position: "relative", top: 0, zIndex: 2 }}></Box>
+      <Box sx={{ position: "sticky", top: 0, zIndex: 2 }}>
+        <CUAndTSLView />
+      </Box>
     </Stack>
   );
 }

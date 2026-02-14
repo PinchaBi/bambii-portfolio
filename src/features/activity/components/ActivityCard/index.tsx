@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { activityList } from "../../constants";
+
+import { Box, Fade, IconButton, Stack, Typography } from "@mui/material";
 import { ArrowUpRight, Users, X } from "lucide-react";
+
 import GlassButton from "@/components/ui/common/GlassButton";
-import { Stack, Typography, Fade, Box, IconButton } from "@mui/material";
+
+import { activityList } from "../../constants";
 
 type ActivityCardProps = {
   centerIndex: number;

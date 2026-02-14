@@ -7,7 +7,7 @@ import useCarousel from "@/hooks/useCarousel";
 
 import GlassSurface from "@/components/ui/GlassSurface";
 
-import CarouselVideo from "./CarouselVideo";
+import VideoCarousel from "..";
 
 type ImageCarouselProps = {
   images: string[];
@@ -72,7 +72,7 @@ const ImageCarousel = ({
 
           if (isVideo)
             return (
-              <CarouselVideo
+              <VideoCarousel
                 key={`${index}-${image}`}
                 src={image}
                 isActive={index === currentIndex && isActive}

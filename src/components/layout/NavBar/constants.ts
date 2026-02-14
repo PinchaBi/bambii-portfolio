@@ -8,12 +8,11 @@ export const menus: NavBarItemType[] = [
     name: "Home",
   },
   {
-    name: "About",
-  },
-  {
     name: "Project",
+    hash: "#project-view",
   },
   {
     name: "Activity",
+    hash: "#activity-view",
   },
 ];
