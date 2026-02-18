@@ -4,8 +4,8 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 
 import useCarousel from "@/hooks/useCarousel";
 
-import Wrapper from "@/components/layout/Wrapper";
 import GradualBlur from "@/components/animate-ui/GradualBlur";
+import Wrapper from "@/components/layout/Wrapper";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import GlassButton from "@/components/ui/common/GlassButton";
 
@@ -25,12 +25,7 @@ const ActivityView = () => {
   //region Renders
 
   return (
-    <Wrapper
-      sx={{
-        zIndex: 1,
-        bgcolor: "colors.bambiiGray",
-      }}
-    >
+    <Wrapper zIndex={1} bgcolor="colors.bambiiGray">
       <BackgroundRippleEffect rows={15} />
       <svg
         width={0}
@@ -42,7 +37,14 @@ const ActivityView = () => {
           <stop offset="100%" stopColor="#777777" />
         </linearGradient>
       </svg>
-      <Stack spacing={7.5} direction="row" height="100%" position="relative" zIndex={1} sx={{ pointerEvents: "none" }}>
+      <Stack
+        zIndex={1}
+        spacing={7.5}
+        height="100%"
+        direction="row"
+        position="relative"
+        sx={{ pointerEvents: "none" }}
+      >
         <Stack
           width={500}
           spacing={1.25}

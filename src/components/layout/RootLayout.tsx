@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 
 import { Outlet, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
@@ -15,11 +15,15 @@ export default function RootLayout() {
 
   const location = useLocation();
 
+  useLayoutEffect(() => {
+    window.history.scrollRestoration = "manual";
+  }, []);
+
   useEffect(() => {
     if (location.hash) {
       const element = document.getElementById(location.hash.slice(1));
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: "instant" });
       }
     } else {
       window.scrollTo({ top: 0, behavior: "instant" });

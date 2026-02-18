@@ -6,7 +6,7 @@ import type { NavBarItemType } from "./types";
 
 type NavBarItemProps = NavBarItemType;
 
-const NavBarItem = ({ name, hash, isLight }: NavBarItemProps) => {
+const NavBarItem = ({ name, hash, isLight, isInProjectView }: NavBarItemProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
 
@@ -36,7 +36,7 @@ const NavBarItem = ({ name, hash, isLight }: NavBarItemProps) => {
         cursor: "pointer",
         transition: "color 0.3s ease",
         "&:hover": {
-          color: isLight ? "colors.bambiiPink" : "white",
+          color: isInProjectView ? "white" : "colors.bambiiPink",
         },
       }}
     >

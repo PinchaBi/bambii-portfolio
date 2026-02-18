@@ -83,7 +83,17 @@ const ProjectView = () => {
       >
         <Stack spacing={1.25} textAlign="center">
           <Typography variant="h1">Types of Work</Typography>
-          <Typography variant="h4" fontSize={24}>
+          <Typography
+            variant="h4"
+            fontSize={24}
+            sx={{
+              "@keyframes blink": {
+                "0%, 100%": { opacity: 1 },
+                "50%": { opacity: 0.25 },
+              },
+              animation: "blink 1.6s ease-in-out infinite",
+            }}
+          >
             <ShinyText
               text="Choose a category to explore"
               speed={2}

@@ -11,7 +11,7 @@ type StrokePath = {
 // "B" character only (used for logo icon)
 export const B_PATHS: StrokePath[] = [
   {
-    d: "M48.95 0.41 C39.45 -3.59 30.45 22.91 18.95 40.41 C7.41 57.96 0.95 48 0.95 48 C-0.55 46 -0.55 43.09 2.95 41",
+    d: "M2.95 41 C-0.55 43.09 -0.55 46 0.95 48 C0.95 48 7.41 57.96 18.95 40.41 C30.45 22.91 39.45 -3.59 48.95 0.41",
     tx: 0,
     ty: 0,
     delay: 0,
@@ -83,5 +83,21 @@ export const BAMBII_PATHS: StrokePath[] = [
     ty: 38.77,
     delay: 2.79,
     duration: 0.15,
+  },
+  // First "i" dot
+  {
+    d: "M5 -8 C5.4 -9.2 6.8 -8.6 6 -7.4",
+    tx: 165.45,
+    ty: 38.77,
+    delay: 2.8,
+    duration: 0.1,
+  },
+  // Second "i" dot
+  {
+    d: "M23.5 -8 C23.9 -9.2 25.3 -8.6 24.5 -7.4",
+    tx: 165.45,
+    ty: 38.77,
+    delay: 2.95,
+    duration: 0.1,
   },
 ];

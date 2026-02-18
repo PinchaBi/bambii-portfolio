@@ -27,9 +27,9 @@ const ActivityCard = ({ centerIndex }: ActivityCardProps) => {
 
   return (
     <Box
-      position="relative"
       width={450}
       height={290}
+      position="relative"
       sx={{ pointerEvents: "none" }}
     >
       <Stack

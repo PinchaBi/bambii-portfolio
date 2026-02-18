@@ -16,7 +16,7 @@ export const projectList: ProjectCardType[] = [
   },
   {
     title: "Illustration & Product design",
-    path: "/illustration",
+    path: "/illustrator",
     image: "/images/project/illustration-and-product-design-default.png",
   },
 ];
