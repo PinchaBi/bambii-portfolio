@@ -7,7 +7,7 @@ import useCarousel from "@/hooks/useCarousel";
 
 import GlassSurface from "@/components/ui/GlassSurface";
 
-import VideoCarousel from "..";
+import VideoCarousel from "../VideoCarousel";
 
 type ImageCarouselProps = {
   images: string[];

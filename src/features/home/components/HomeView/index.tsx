@@ -1,8 +1,14 @@
-import { Box } from "@mui/material";
+import { Stack } from "@mui/material";
+
+import Wrapper from "@/components/layout/Wrapper";
 
 export default function HomeView() {
   // --------------------------- Renders ---------------------------
   //region Renders
 
-  return <Box></Box>;
+  return (
+    <Wrapper>
+      <Stack></Stack>
+    </Wrapper>
+  );
 }

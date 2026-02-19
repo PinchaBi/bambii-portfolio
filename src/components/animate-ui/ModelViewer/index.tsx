@@ -20,7 +20,7 @@ import {
   useThree,
 } from "@react-three/fiber";
 import * as THREE from "three";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
+import { OBJLoader } from "three-stdlib";
 
 const isMeshObject = (object: THREE.Object3D): object is THREE.Mesh => {
   return "isMesh" in object && object.isMesh === true;
