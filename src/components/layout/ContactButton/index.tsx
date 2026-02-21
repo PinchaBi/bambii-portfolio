@@ -7,9 +7,13 @@ import EyeFollower from "../EyeFollower";
 
 type ContactButtonProps = {
   hasBorder?: boolean;
+  isBlack?: boolean;
 };
 
-const ContactButton = ({ hasBorder = false }: ContactButtonProps) => {
+const ContactButton = ({
+  hasBorder = false,
+  isBlack = false,
+}: ContactButtonProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
 
@@ -35,11 +39,12 @@ const ContactButton = ({ hasBorder = false }: ContactButtonProps) => {
       sx={{
         gap: 1.25,
         color: "white",
-        bgcolor: "black",
         borderRadius: 7.5,
         padding: "10px 15px",
-        transition: "border 0.3s ease",
+        bgcolor: isBlack ? "colors.bambiiPink" : "black",
         border: hasBorder ? "1.5px solid white" : "1.5px solid transparent",
+        transition:
+          "border 0.3s ease-in-out, background-color 0.3s ease-in-out",
       }}
     >
       <Typography variant="button" fontWeight={600}>

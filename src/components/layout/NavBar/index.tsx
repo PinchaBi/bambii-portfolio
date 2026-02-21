@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { AppBar, Stack, Toolbar } from "@mui/material";
 import { useLocation } from "react-router-dom";
+
+import { AppBar, Stack, Toolbar } from "@mui/material";
 
 import GradualBlur from "@/components/animate-ui/GradualBlur";
 import BambiiLogo from "@/components/ui/BambiiLogo";
@@ -17,21 +18,29 @@ const NavBar = () => {
   const { pathname } = useLocation();
 
   const [hasBorder, setHasBorder] = useState(true);
+  const [isInAboutView, setIsInAboutView] = useState(false);
   const [isInProjectView, setIsInProjectView] = useState(false);
   const [isInContactView, setIsInContactView] = useState(false);
   const [isInCUSocietyView, setIsInCUSocietyView] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
+      const aboutSection = document.getElementById("about-view");
       const projectSection = document.getElementById("project-view");
       const contactSection = document.getElementById("contact-view");
       const cusocietySection = document.getElementById("cusociety-view");
 
+      const aboutRect = aboutSection?.getBoundingClientRect();
       const projectRect = projectSection?.getBoundingClientRect();
       const contactRect = contactSection?.getBoundingClientRect();
       const cusocietyRect = cusocietySection?.getBoundingClientRect();
 
-      const inProjectView = projectRect ? projectRect.bottom > 20 : false;
+      const inAboutView = aboutRect
+        ? aboutRect.top < 20 && aboutRect.bottom > 20
+        : false;
+      const inProjectView = projectRect
+        ? projectRect.top < 20 && projectRect.bottom > 20
+        : false;
       const inContactView = contactRect
         ? contactRect.bottom < window.innerHeight + 65
         : false;
@@ -41,11 +50,12 @@ const NavBar = () => {
           cusocietyRect.bottom < window.innerHeight + 65
         : false;
 
+      setIsInAboutView(inAboutView);
       setIsInProjectView(inProjectView);
       setIsInContactView(inContactView);
       setIsInCUSocietyView(inCUSocietyView);
 
-      if (inProjectView || inContactView || inCUSocietyView) {
+      if (inProjectView) {
         setHasBorder(true);
       } else {
         setHasBorder(false);
@@ -56,6 +66,10 @@ const NavBar = () => {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, [pathname]);
+
+  // --------------------------- Variables ---------------------------
+  //region Variables
+  const isBgBlack = isInContactView || isInCUSocietyView;
 
   // --------------------------- Renders ---------------------------
   //region Renders
@@ -79,22 +93,19 @@ const NavBar = () => {
           zIndex: 2,
         }}
       >
-        <BambiiLogo
-          isLight={isInContactView || isInCUSocietyView}
-          isInProjectView={isInProjectView}
-        />
+        <BambiiLogo isLight={isBgBlack} isInProjectView={isInProjectView} />
         <Stack spacing={1.25} direction="row" paddingRight={2}>
           {menus.map((menu, index) => (
             <NavBarItem
               key={`${index}-${menu.name}`}
               {...menu}
-              isLight={isInContactView || isInCUSocietyView}
+              isLight={isBgBlack}
               isInProjectView={isInProjectView}
             />
           ))}
         </Stack>
 
-        <ContactButton hasBorder={hasBorder} />
+        <ContactButton hasBorder={hasBorder} isBlack={isBgBlack} />
       </Toolbar>
 
       <GradualBlur

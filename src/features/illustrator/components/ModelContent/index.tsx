@@ -137,7 +137,7 @@ const ModelContent = ({
 
   return (
     <Box
-      sx={{ width, height, borderRadius: 2.5, overflow: "hidden" }}
+      sx={{ width, height, borderRadius: 2.5 }}
       onPointerEnter={() => {
         insideBox.current = true;
         setHovered(true);

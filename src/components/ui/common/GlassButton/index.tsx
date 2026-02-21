@@ -1,5 +1,6 @@
-import { Button, type ButtonProps, Typography, Box } from "@mui/material";
+import { Box, Button, type ButtonProps, Typography } from "@mui/material";
 import { motion, type Variants } from "motion/react";
+
 import GlassSurface from "@/components/ui/GlassSurface";
 
 interface GlassButtonProps extends ButtonProps {
@@ -118,7 +119,13 @@ const GlassButton = ({
       />
 
       {/* Content wrapper to stay above glass */}
-      <Box position="relative" zIndex={1} display="flex" alignItems="center" gap={0.5}>
+      <Box
+        position="relative"
+        zIndex={1}
+        display="flex"
+        alignItems="center"
+        gap={0.5}
+      >
         {text ? (
           <>
             {icon}
@@ -135,13 +142,7 @@ const GlassButton = ({
                   variants={childVariants}
                   style={{ display: "inline-block", whiteSpace: "pre" }}
                 >
-                  <Typography
-                    variant="overline"
-                    lineHeight="14px"
-                    component="span"
-                  >
-                    {char}
-                  </Typography>
+                  <Typography component="span">{char}</Typography>
                 </motion.span>
               ))}
             </motion.div>

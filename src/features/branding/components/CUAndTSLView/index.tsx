@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { Box } from "@mui/material";
 import { Canvas } from "@react-three/fiber";
 
-import { Experience } from "@/components/ui/Experience";
+import { Experience } from "@/features/branding/components/Experience";
 
 import CUSocietyView from "../../cusociety/components/CUSocietyView";
 import ElexirView from "../../elexir/components/ElexirView";
@@ -90,7 +90,10 @@ const CUAndTSLView = ({ onLoaded }: CUAndTSLViewProps) => {
             }}
             style={{ pointerEvents: "none" }}
           >
-            <Experience scrollProgressRef={scrollProgressRef} onLoaded={onLoaded} />
+            <Experience
+              scrollProgressRef={scrollProgressRef}
+              onLoaded={onLoaded}
+            />
           </Canvas>
         </Box>
       </Box>

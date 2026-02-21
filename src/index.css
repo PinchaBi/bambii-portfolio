@@ -100,8 +100,7 @@
   font-style: italic;
   font-weight: 700;
   font-display: swap;
-  src: url("/fonts/PlayfairDisplay/PlayfairDisplay-BoldItalic.ttf")
-    format("truetype");
+  src: url("/fonts/PlayfairDisplay/PlayfairDisplay-BoldItalic.ttf") format("truetype");
 }
 
 @theme inline {
@@ -218,22 +217,29 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
+  /* html {
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+  } */
 }
 
 @theme inline {
-  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1
-    var(--delay, 0ms);
+  --animate-cell-ripple: cell-ripple var(--duration, 200ms) ease-out none 1 var(--delay, 0ms);
 
   @keyframes cell-ripple {
     0% {
       opacity: 0.3;
     }
+
     50% {
       opacity: 1;
     }
+
     100% {
       opacity: 0.3;
     }

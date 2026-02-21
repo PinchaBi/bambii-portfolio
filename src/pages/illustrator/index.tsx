@@ -23,7 +23,7 @@ export default function IllustratorPage() {
     <Stack>
       <PageLoading isLoading={isLoading} title="ILLUSTRATOR" />
       <Typography
-        variant="h1"
+        variant="h2"
         height="25vh"
         paddingX={15}
         display="flex"

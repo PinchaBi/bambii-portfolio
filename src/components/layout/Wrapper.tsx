@@ -17,7 +17,7 @@ const Wrapper = ({
       width="100vw"
       height="100vh"
       position="relative"
-      sx={{ ...sx }}
+      sx={{ scrollSnapAlign: "start", ...sx }}
       {...props}
     >
       {children}

@@ -43,7 +43,7 @@ const FallingItem = ({
   hoverRotationY,
   hoverRotationZ,
   noRotateOnHover,
-  companion,
+  companions,
   width,
   height,
   x,
@@ -245,57 +245,62 @@ const FallingItem = ({
           justifyContent: "center",
         }}
       >
-        <ItemContent
-          variant={variant}
-          image={image}
-          hoverImage={hoverImage}
-          isHovered={isHovered}
-          hoverRotationX={hoverRotationX}
-          hoverRotationY={hoverRotationY}
-          hoverRotationZ={hoverRotationZ}
-          width={width}
-          height={height}
-          modelMargin={modelMargin}
-          onPointerEnter={() => {
-            if (!modelDragState.active && settled) onHover(id);
-          }}
-          onPointerLeave={() => {
-            if (!modelDragState.active && settled) onHover(null);
-          }}
-        />
+        <div style={{ position: "relative", zIndex: 0, width: "100%", height: "100%" }}>
+          <ItemContent
+            variant={variant}
+            image={image}
+            hoverImage={hoverImage}
+            isHovered={isHovered}
+            hoverRotationX={hoverRotationX}
+            hoverRotationY={hoverRotationY}
+            hoverRotationZ={hoverRotationZ}
+            width={width}
+            height={height}
+            modelMargin={modelMargin}
+            onPointerEnter={() => {
+              if (!modelDragState.active && settled) onHover(id);
+            }}
+            onPointerLeave={() => {
+              if (!modelDragState.active && settled) onHover(null);
+            }}
+          />
+        </div>
 
-        {/* Companion element shown on hover */}
+        {/* Companion elements shown on hover */}
         <AnimatePresence>
-          {isHovered && companion && (
-            <motion.div
-              key="companion"
-              initial={{ opacity: 0, scale: 0.75 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.75 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              style={{
-                position: "absolute",
-                left: width + (companion.offsetX ?? 0),
-                top: `calc(50% + ${companion.offsetY ?? 0}px)`,
-                translateY: "-50%",
-                width: width * companion.widthRatio,
-                height: height * companion.heightRatio,
-                pointerEvents: "none",
-              }}
-            >
-              <img
-                src={companion.image}
+          {isHovered &&
+            companions?.map((companion, i) => (
+              <motion.div
+                key={`companion-${i}`}
+                initial={{ opacity: 0, scale: 0.75 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.75 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  userSelect: "none",
-                  display: "block",
+                  position: "absolute",
+                  left: width + (companion.offsetX ?? 0),
+                  top: `calc(50% + ${companion.offsetY ?? 0}px)`,
+                  translateY: "-50%",
+                  width: width * companion.widthRatio,
+                  height: height * companion.heightRatio,
+                  pointerEvents: "none",
+                  rotate: `${companion.rotation ?? 0}deg`,
+                  zIndex: companion.zIndex,
                 }}
-                draggable={false}
-              />
-            </motion.div>
-          )}
+              >
+                <img
+                  src={companion.image}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    userSelect: "none",
+                    display: "block",
+                  }}
+                  draggable={false}
+                />
+              </motion.div>
+            ))}
         </AnimatePresence>
       </motion.div>
     </div>

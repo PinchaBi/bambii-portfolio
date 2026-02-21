@@ -18,7 +18,7 @@ export default function BrandingPage() {
       <PageLoading isLoading={isLoading} title="BRANDING" />
 
       <Typography
-        variant="h1"
+        variant="h2"
         height="25vh"
         display="flex"
         alignItems="flex-end"
