@@ -11,9 +11,22 @@ export default function HomePage() {
 
   return (
     <Stack>
-      <Box id="about-view" sx={{ position: "relative", top: 0, zIndex: 1 }}>
+      {/* About: sticky at top — stays visible while spacer scrolls below */}
+      <Box
+        id="about-view"
+        sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
+          height: "100vh",
+          overflow: "hidden",
+        }}
+      >
         <AboutView />
       </Box>
+      {/* Scroll budget for about animations (200vh = full interactivity range) */}
+      <Box sx={{ height: "200vh" }} />
+      {/* Project: slides up and overlays about */}
       <Box id="project-view" sx={{ position: "relative", top: 0, zIndex: 2 }}>
         <ProjectView />
       </Box>

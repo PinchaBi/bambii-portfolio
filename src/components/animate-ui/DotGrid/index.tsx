@@ -86,6 +86,11 @@ const DotGrid: React.FC<DotGridProps> = ({
   const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
   const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);
 
+  // Interpolated colors — start at initial values, lerp toward target each frame
+  const currentBaseRgb = useRef({ ...hexToRgb(baseColor) });
+  const currentActiveRgb = useRef({ ...hexToRgb(activeColor) });
+  const lastDrawTime = useRef<number>(0);
+
   const circlePath = useMemo(() => {
     if (typeof window === "undefined" || !window.Path2D) return null;
 
@@ -139,12 +144,25 @@ const DotGrid: React.FC<DotGridProps> = ({
     let rafId: number;
     const proxSq = proximity * proximity;
 
-    const draw = () => {
+    const draw = (timestamp: number) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // ── Lerp current colors toward target ──
+      const dt = lastDrawTime.current ? (timestamp - lastDrawTime.current) / 1000 : 0;
+      lastDrawTime.current = timestamp;
+      const factor = 1 - Math.exp(-5 * dt); // ~0.6s transition at k=5
+      const cb = currentBaseRgb.current;
+      const ca = currentActiveRgb.current;
+      cb.r += (baseRgb.r - cb.r) * factor;
+      cb.g += (baseRgb.g - cb.g) * factor;
+      cb.b += (baseRgb.b - cb.b) * factor;
+      ca.r += (activeRgb.r - ca.r) * factor;
+      ca.g += (activeRgb.g - ca.g) * factor;
+      ca.b += (activeRgb.b - ca.b) * factor;
 
       const { x: px, y: py } = pointerRef.current;
 
@@ -155,13 +173,13 @@ const DotGrid: React.FC<DotGridProps> = ({
         const dy = dot.cy - py;
         const dsq = dx * dx + dy * dy;
 
-        let style = baseColor;
+        let style = `rgb(${Math.round(cb.r)},${Math.round(cb.g)},${Math.round(cb.b)})`;
         if (dsq <= proxSq) {
           const dist = Math.sqrt(dsq);
           const t = 1 - dist / proximity;
-          const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * t);
-          const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
-          const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
+          const r = Math.round(cb.r + (ca.r - cb.r) * t);
+          const g = Math.round(cb.g + (ca.g - cb.g) * t);
+          const b = Math.round(cb.b + (ca.b - cb.b) * t);
           style = `rgb(${r},${g},${b})`;
         }
 
@@ -175,9 +193,9 @@ const DotGrid: React.FC<DotGridProps> = ({
       rafId = requestAnimationFrame(draw);
     };
 
-    draw();
+    rafId = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(rafId);
-  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+  }, [proximity, baseRgb, activeRgb, circlePath]);
 
   useEffect(() => {
     buildGrid();

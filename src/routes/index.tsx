@@ -25,6 +25,10 @@ const router = createBrowserRouter([
         element: <WebDesignPage />,
       },
       {
+        path: "/web-design/:webDesignId",
+        element: <WebDesignPage />,
+      },
+      {
         path: "/illustrator",
         element: <IllustratorPage />,
       },

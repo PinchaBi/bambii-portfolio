@@ -1,26 +1,76 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 import { colors } from "@/theme/theme";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { Canvas } from "@react-three/fiber";
+import { useSetAtom } from "jotai";
 import { ArrowRight, Copy } from "lucide-react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 import DotGrid from "@/components/animate-ui/DotGrid";
 import GlassButton from "@/components/ui/common/GlassButton";
 
+import { pageAtom } from "../../constants";
 import { Experience } from "../Experience";
 
 // ─── Types ───
 
 type Phase = "entering" | "presented";
 
+// ─── WordReveal ───
+
+const wordVariant = {
+  hidden: { y: 24, opacity: 0 },
+  visible: (i: number) => ({
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.45, ease: "easeOut" as const, delay: i * 0.06 },
+  }),
+};
+
+const WordReveal = ({
+  text,
+  animate,
+  baseDelay = 0,
+  style,
+}: {
+  text: string;
+  animate: boolean;
+  baseDelay?: number;
+  style?: React.CSSProperties;
+}) => {
+  const words = text.split(" ");
+  return (
+    <span style={{ display: "inline", ...style }}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          custom={baseDelay + i}
+          variants={wordVariant}
+          initial="hidden"
+          animate={animate ? "visible" : "hidden"}
+          style={{ display: "inline-block", marginRight: "0.3em" }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
+};
+
 // ─── Component ───
 
 const AboutView = () => {
-  const outerRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("entering");
   const [isInteractive, setIsInteractive] = useState(false);
+  const [bookShouldEnter, setBookShouldEnter] = useState(false);
+  const setPage = useSetAtom(pageAtom);
+
+  // Top text animates immediately; book enters after text finishes (~850ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setBookShouldEnter(true), 850);
+    return () => clearTimeout(timer);
+  }, []);
 
   // entering → presented: triggered by the 3D scene once the book has landed
   const handleBookEntered = useCallback(() => setPhase("presented"), []);
@@ -35,11 +85,14 @@ const AboutView = () => {
     };
   }, [phase]);
 
-  // Scroll progress: 0 (top) → 1 (scrolled 100vh into the 200vh container)
-  const { scrollYProgress } = useScroll({
-    target: outerRef,
-    offset: ["start start", "end start"],
-  });
+  // Scroll progress: 0 (top of page) → 1 (200vh scrolled, when project enters)
+  const { scrollY } = useScroll();
+  const scrollYProgress = useTransform(
+    scrollY,
+    [0, window.innerHeight * 2],
+    [0, 1],
+    { clamp: true },
+  );
 
   // Scroll-driven interactivity — reversible
   useEffect(() => {
@@ -47,6 +100,11 @@ const AboutView = () => {
       if (isPresenting) setIsInteractive(v > 0.08);
     });
   }, [scrollYProgress, isPresenting]);
+
+  // Close the book when scrolling back to top
+  useEffect(() => {
+    if (!isInteractive) setPage(0);
+  }, [isInteractive, setPage]);
 
   // Play flip sound when book becomes interactive
   useEffect(() => {
@@ -61,21 +119,20 @@ const AboutView = () => {
   const bottomScrollY = useTransform(scrollYProgress, [0, 0.5], [0, 180]);
   const bottomScrollOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
 
-  return (
-    // Outer: provides 200vh of scroll space
-    <div ref={outerRef} style={{ height: "300vh", scrollSnapAlign: "start" }}>
-      {/* Sticky viewport — stays fixed while user scrolls through the 200vh */}
+  // Bottom text word count for stagger offset
+  const bodyText =
+    "I design digital experiences where identity and usability work together";
+  const bodyWordCount = bodyText.split(" ").length;
 
-      <motion.div
-        animate={{ backgroundColor: colors.bambiiGray }}
-        transition={{ duration: 1, ease: "easeInOut" }}
-        style={{
-          position: "sticky",
-          top: 0,
-          height: "100vh",
-          overflow: "hidden",
-        }}
-      >
+  return (
+    <motion.div
+      animate={{ backgroundColor: colors.bambiiGray }}
+      transition={{ duration: 1, ease: "easeInOut" }}
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
         <Box
           position="absolute"
           sx={{
@@ -85,8 +142,8 @@ const AboutView = () => {
           <DotGrid
             dotSize={5}
             gap={15}
-            baseColor="#D9D9D9"
-            activeColor="#f13a7d"
+            baseColor={isInteractive ? "#D9D9D9" : "#EEEEEE"}
+            activeColor={isInteractive ? "#f13a7d" : "#D9D9D9"}
             proximity={120}
             shockRadius={250}
             shockStrength={5}
@@ -158,7 +215,11 @@ const AboutView = () => {
             camera={{ position: [0.64, 0, 4], fov: 45 }}
           >
             <Suspense fallback={null}>
-              <Experience isInteractive={isInteractive} onEntered={handleBookEntered} />
+              <Experience
+                isInteractive={isInteractive}
+                onEntered={handleBookEntered}
+                shouldEnter={bookShouldEnter}
+              />
             </Suspense>
           </Canvas>
         </div>
@@ -168,11 +229,11 @@ const AboutView = () => {
           <div style={{ position: "absolute", inset: 0, zIndex: 6 }} />
         )}
 
-        {/* ── Top text — scroll-driven exit (reversible) ── */}
+        {/* ── Top text — word-by-word reveal + scroll-driven exit ── */}
         <motion.div
           style={{
             position: "absolute",
-            top: 85,
+            top: 100,
             left: "50%",
             x: "-50%",
             zIndex: 10,
@@ -192,21 +253,26 @@ const AboutView = () => {
               fontStyle="italic"
               fontFamily="PlayfairDisplay"
               color="inherit"
+              component="div"
             >
-              Looks good
+              <WordReveal text="Looks good" animate={true} baseDelay={0} />
             </Typography>
-            <Typography variant="h1" color="inherit">
-              BUT DOES IT WORK?
+            <Typography variant="h1" color="inherit" component="div">
+              <WordReveal
+                text="BUT DOES IT WORK?"
+                animate={true}
+                baseDelay={2}
+              />
             </Typography>
           </motion.div>
         </motion.div>
 
-        {/* ── Bottom stack — fly-in on present, scroll-driven exit ── */}
+        {/* ── Bottom stack — word-by-word + scroll-driven exit ── */}
         {/* Outer: scroll offset */}
         <motion.div
           style={{
             position: "absolute",
-            bottom: 10,
+            bottom: 75,
             left: "50%",
             x: "-50%",
             zIndex: 10,
@@ -214,18 +280,7 @@ const AboutView = () => {
             opacity: bottomScrollOpacity,
           }}
         >
-          {/* Inner: timer-based fly-in */}
-          <motion.div
-            initial={{ y: 200, opacity: 0 }}
-            animate={{
-              y: isPresenting ? 0 : 200,
-              opacity: isPresenting ? 1 : 0,
-            }}
-            transition={
-              isPresenting
-                ? { duration: 0.8, ease: "easeOut", delay: 0.4 }
-                : { duration: 0.4, ease: "easeIn" }
-            }
+          <div
             style={{
               display: "flex",
               flexDirection: "column",
@@ -237,40 +292,67 @@ const AboutView = () => {
               variant="body1"
               fontSize={20}
               textAlign="center"
+              component="div"
               sx={{ maxWidth: 485 }}
             >
-              I design digital experiences where identity and usability work
-              together
+              <WordReveal
+                text={bodyText}
+                animate={isPresenting}
+                baseDelay={0}
+              />
             </Typography>
             <Stack spacing={1.25} direction="row">
-              <Button
-                component={motion.button}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
-                type="submit"
-                sx={{
-                  gap: 1.25,
-                  color: "white",
-                  borderRadius: 7.5,
-                  padding: "10px 20px",
-                  background:
-                    "linear-gradient(to top right, #CC2C66, #F13A7D, #FFD9E7)",
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={
+                  isPresenting ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }
+                }
+                transition={{
+                  duration: 0.45,
+                  ease: "easeOut",
+                  delay: isPresenting ? bodyWordCount * 0.06 + 0.1 : 0,
                 }}
               >
-                Explore my work
-                <ArrowRight />
-              </Button>
-              <GlassButton
-                icon={<Copy size={16} />}
-                text="Copy email"
-                sx={{ fontSize: 12 }}
-              />
+                <Button
+                  component={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  type="submit"
+                  sx={{
+                    gap: 1.25,
+                    color: "white",
+                    borderRadius: 7.5,
+                    padding: "10px 20px",
+                    background:
+                      "linear-gradient(to top right, #CC2C66, #F13A7D, #FFD9E7)",
+                  }}
+                >
+                  Explore my work
+                  <ArrowRight />
+                </Button>
+              </motion.div>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={
+                  isPresenting ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }
+                }
+                transition={{
+                  duration: 0.45,
+                  ease: "easeOut",
+                  delay: isPresenting ? bodyWordCount * 0.06 + 0.22 : 0,
+                }}
+              >
+                <GlassButton
+                  icon={<Copy size={16} />}
+                  text="Copy email"
+                  sx={{ height: "100%", fontSize: 12 }}
+                />
+              </motion.div>
             </Stack>
-          </motion.div>
+          </div>
         </motion.div>
       </motion.div>
-    </div>
   );
 };
 

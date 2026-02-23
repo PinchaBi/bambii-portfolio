@@ -6,6 +6,7 @@ const MIN_LOADING_MS = 1850;
 
 export const useLoading = (minMs = MIN_LOADING_MS) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [timerKey, setTimerKey] = useState(0);
   const contentReady = useRef(false);
   const minTimeReady = useRef(false);
 
@@ -20,13 +21,20 @@ export const useLoading = (minMs = MIN_LOADING_MS) => {
     tryFinish();
   }, [tryFinish]);
 
+  const startLoading = useCallback(() => {
+    contentReady.current = false;
+    minTimeReady.current = false;
+    setIsLoading(true);
+    setTimerKey((k) => k + 1);
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       minTimeReady.current = true;
       tryFinish();
     }, minMs);
     return () => clearTimeout(timer);
-  }, [minMs, tryFinish]);
+  }, [minMs, tryFinish, timerKey]);
 
-  return { isLoading, handleLoaded } as const;
+  return { isLoading, setIsLoading, handleLoaded, startLoading } as const;
 };
