@@ -51,7 +51,11 @@ type BookEntranceProps = {
   shouldEnter: boolean;
 };
 
-const BookEntrance = ({ isInteractive, onEntered, shouldEnter }: BookEntranceProps) => {
+const BookEntrance = ({
+  isInteractive,
+  onEntered,
+  shouldEnter,
+}: BookEntranceProps) => {
   const groupRef = useRef<Group>(null!);
   const floatGroupRef = useRef<Group>(null!);
   const initialized = useRef(false);
@@ -73,9 +77,8 @@ const BookEntrance = ({ isInteractive, onEntered, shouldEnter }: BookEntrancePro
     if (!shouldEnter) return;
 
     // ── Page-driven X centering — only offset once pages are actually open ──
-    const targetX = isInteractive && page > 0
-      ? (page / pages.length - 0.5) * PAGE_WIDTH
-      : 0;
+    const targetX =
+      isInteractive && page > 0 ? (page / pages.length - 0.5) * PAGE_WIDTH : 0;
 
     easing.damp3(
       groupRef.current.position,
@@ -131,12 +134,20 @@ const BookEntrance = ({ isInteractive, onEntered, shouldEnter }: BookEntrancePro
 
 // ─── Experience ───
 
-export const Experience = ({ isInteractive, onEntered, shouldEnter }: ExperienceProps) => {
+export const Experience = ({
+  isInteractive,
+  onEntered,
+  shouldEnter,
+}: ExperienceProps) => {
   return (
     <>
       <CameraController isInteractive={isInteractive} />
 
-      <BookEntrance isInteractive={isInteractive} onEntered={onEntered} shouldEnter={shouldEnter} />
+      <BookEntrance
+        isInteractive={isInteractive}
+        onEntered={onEntered}
+        shouldEnter={shouldEnter}
+      />
 
       <OrbitControls enabled={isInteractive} enableZoom={false} />
 

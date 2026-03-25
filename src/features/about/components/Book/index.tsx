@@ -28,7 +28,7 @@ const easingFactor = 0.5;
 const easingFactorFold = 0.3;
 const insideCurveStrength = 0.18;
 const outsideCurveStrength = 0.05;
-const turningCurveStrength = 0.09;
+const turningCurveStrength = 0.05;
 
 const PAGE_WIDTH = 1.28;
 const PAGE_HEIGHT = 1.71;
@@ -84,7 +84,7 @@ const pageMaterials = [
 pages.forEach((page) => {
   useTexture.preload(`/images/about/${page.front}.png`);
   useTexture.preload(`/images/about/${page.back}.png`);
-  useTexture.preload(`/images/about/book-cover-roughness.jpg`);
+  useTexture.preload(`/images/about/pattern-cover.png`);
 });
 
 // ─── Types ───
@@ -115,7 +115,7 @@ const Page = ({
       `/images/about/${front}.png`,
       `/images/about/${back}.png`,
       ...(number === 0 || number === pages.length - 1
-        ? [`/images/about/book-cover-roughness.jpg`]
+        ? [`/images/about/pattern-cover.png`]
         : []),
     ],
     (textures) => {
@@ -149,7 +149,7 @@ const Page = ({
         map: picture,
         ...(number === 0
           ? { roughnessMap: pictureRoughness }
-          : { roughness: 0.1 }),
+          : { roughness: 0.5 }),
         emissive: emissiveColor,
         emissiveIntensity: 0,
       }),
@@ -158,7 +158,7 @@ const Page = ({
         map: picture2,
         ...(number === pages.length - 1
           ? { roughnessMap: pictureRoughness }
-          : { roughness: 0.1 }),
+          : { roughness: 0.7 }),
         emissive: emissiveColor,
         emissiveIntensity: 0,
       }),
