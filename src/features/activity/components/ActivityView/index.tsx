@@ -23,7 +23,6 @@ const ActivityView = () => {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const activeIndexRef = useRef(0);
-  const rafRef = useRef(0);
   const snapTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const isSnappingRef = useRef(false);
   const lastScrollValRef = useRef(0);
@@ -71,43 +70,41 @@ const ActivityView = () => {
     };
 
     const handleScroll = () => {
-      cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
-        tick();
+      // Direct call — no rAF delay. Scroll events already fire once per
+      // frame in modern browsers, so rAF only adds a 1-frame lag.
+      tick();
 
-        // Snap to nearest item when user stops scrolling
-        if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
-        const scrollVal = lastScrollValRef.current;
+      // Snap to nearest item when user stops scrolling
+      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+      const scrollVal = lastScrollValRef.current;
 
-        if (scrollVal > 0 && scrollVal < ITEM_AMOUNT - 1) {
-          snapTimerRef.current = setTimeout(() => {
-            if (!isSnappingRef.current) {
-              const nearest = Math.round(scrollVal);
-              if (Math.abs(scrollVal - nearest) > 0.02) {
-                const spacer = spacerRef.current;
-                if (!spacer) return;
-                isSnappingRef.current = true;
-                const spacerTop =
-                  spacer.getBoundingClientRect().top + window.scrollY;
-                const targetScroll =
-                  spacerTop +
-                  (nearest / ITEM_AMOUNT) * spacer.offsetHeight;
-                window.scrollTo({ top: targetScroll, behavior: "smooth" });
-              }
+      if (scrollVal > 0 && scrollVal < ITEM_AMOUNT - 1) {
+        snapTimerRef.current = setTimeout(() => {
+          if (!isSnappingRef.current) {
+            const nearest = Math.round(scrollVal);
+            if (Math.abs(scrollVal - nearest) > 0.02) {
+              const spacer = spacerRef.current;
+              if (!spacer) return;
+              isSnappingRef.current = true;
+              const spacerTop =
+                spacer.getBoundingClientRect().top + window.scrollY;
+              const targetScroll =
+                spacerTop +
+                (nearest / ITEM_AMOUNT) * spacer.offsetHeight;
+              window.scrollTo({ top: targetScroll, behavior: "smooth" });
             }
-            isSnappingRef.current = false;
-          }, SNAP_DELAY);
-        } else {
+          }
           isSnappingRef.current = false;
-        }
-      });
+        }, SNAP_DELAY);
+      } else {
+        isSnappingRef.current = false;
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     tick();
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(rafRef.current);
       if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
     };
   }, []);
