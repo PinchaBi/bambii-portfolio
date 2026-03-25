@@ -63,23 +63,37 @@ const Display = ({
         position="absolute"
         borderRadius={isIphone ? 4 : 1}
       >
-        {showVideo && video ? (
+        {/* Always mount image */}
+        <Box
+          src={image}
+          component="img"
+          alt="Screen Image"
+          width="100%"
+          height="100%"
+          sx={{
+            position: "absolute",
+            opacity: showVideo ? 0 : 1,
+            transition: "opacity 0.3s ease",
+          }}
+        />
+        {/* Always mount video so it can preload/buffer from CDN */}
+        {haveVideo && video && (
           <Box
             src={video}
             component="video"
             autoPlay
             muted
+            loop
+            playsInline
+            preload="auto"
             width="100%"
             height="100%"
-            sx={{ objectFit: "fill" }}
-          />
-        ) : (
-          <Box
-            src={image}
-            component="img"
-            alt="Screen Image"
-            width="100%"
-            height="100%"
+            sx={{
+              objectFit: "fill",
+              position: "absolute",
+              opacity: showVideo ? 1 : 0,
+              transition: "opacity 0.3s ease",
+            }}
           />
         )}
       </Box>
