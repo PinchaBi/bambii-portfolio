@@ -20,6 +20,7 @@ export const colors = {
   lightPink: "#FFD9E7",
 
   mediumGray: "#D9D9D9",
+  mediumGray2: "#A6A6A6",
 
   darkGray: "#3D3D3D",
   darkGray2: "#4E4E4E",
