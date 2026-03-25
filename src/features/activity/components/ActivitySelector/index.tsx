@@ -1,16 +1,16 @@
-import { Box, Stack } from "@mui/material";
-import { activityList } from "../../constants";
+import { memo } from "react";
+
 import { ITEM_AMOUNT } from "@/constants/activity";
+import { Box, Stack } from "@mui/material";
+
+import { activityList } from "../../constants";
 
 type ActivitySelectorProps = {
-  centerIndex: number;
-  setCenterIndex: (index: number) => void;
+  activeIndex: number;
+  onSelect: (index: number) => void;
 };
 
-const ActivitySelector = ({
-  centerIndex,
-  setCenterIndex,
-}: ActivitySelectorProps) => {
+const ActivitySelector = ({ activeIndex, onSelect }: ActivitySelectorProps) => {
   // --------------------------- Renders ---------------------------
   //region Renders
 
@@ -22,7 +22,7 @@ const ActivitySelector = ({
         position="absolute"
         sx={{
           transition: `all 0.3s cubic-bezier(0.4, 0, 0.2, 1)`,
-          transform: `translateY(-${Math.floor(centerIndex / 5) * 440}px)`,
+          transform: `translateY(-${Math.floor(activeIndex / 5) * 440}px)`,
         }}
       >
         {Array.from({ length: ITEM_AMOUNT }).map((_, index) => {
@@ -38,7 +38,7 @@ const ActivitySelector = ({
               borderRadius={2.5}
               position="relative"
               zIndex={ITEM_AMOUNT - index}
-              onClick={() => setCenterIndex(index)}
+              onClick={() => onSelect(index)}
               sx={{
                 border: "none",
                 cursor: "pointer",
@@ -70,9 +70,9 @@ const ActivitySelector = ({
                   sx={{
                     objectFit: "cover",
                     transition: "all 0.2s ease-in-out",
-                    opacity: centerIndex === index ? 1 : 0.7,
+                    opacity: activeIndex === index ? 1 : 0.7,
                     filter:
-                      centerIndex === index
+                      activeIndex === index
                         ? "grayscale(0%)"
                         : "grayscale(100%)",
                   }}
@@ -87,14 +87,14 @@ const ActivitySelector = ({
                   inset: 0,
                   pointerEvents: "none",
                   borderRadius: 2.5,
-                  border: centerIndex === index ? "2px solid" : "none",
+                  border: activeIndex === index ? "2px solid" : "none",
                   borderColor:
-                    centerIndex === index ? "colors.bambiiPink" : "transparent",
+                    activeIndex === index ? "colors.bambiiPink" : "transparent",
                   transition: "border-color 0.2s ease-in-out",
                   maskImage: `
-                    linear-gradient(white, white), 
-                    linear-gradient(white, white), 
-                    linear-gradient(white, white), 
+                    linear-gradient(white, white),
+                    linear-gradient(white, white),
+                    linear-gradient(white, white),
                     linear-gradient(white, white)
                   `,
                   maskPosition:
@@ -102,9 +102,9 @@ const ActivitySelector = ({
                   maskSize: "15px 15px",
                   maskRepeat: "no-repeat",
                   WebkitMaskImage: `
-                    linear-gradient(white, white), 
-                    linear-gradient(white, white), 
-                    linear-gradient(white, white), 
+                    linear-gradient(white, white),
+                    linear-gradient(white, white),
+                    linear-gradient(white, white),
                     linear-gradient(white, white)
                   `,
                   WebkitMaskPosition:
@@ -121,4 +121,4 @@ const ActivitySelector = ({
   );
 };
 
-export default ActivitySelector;
+export default memo(ActivitySelector);

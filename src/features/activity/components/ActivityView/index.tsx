@@ -1,24 +1,134 @@
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { ITEM_AMOUNT } from "@/constants/activity";
 import { Stack, Typography } from "@mui/material";
 import { ArrowDown, ArrowUp } from "lucide-react";
-
-import useCarousel from "@/hooks/useCarousel";
 
 import GradualBlur from "@/components/animate-ui/GradualBlur";
 import Wrapper from "@/components/layout/Wrapper";
 import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 import GlassButton from "@/components/ui/common/GlassButton";
 
-import ActivityCard from "../ActivityCard";
-import ActivityCarousel from "../ActivityCarousel";
+import ActivityCard, { type ActivityCardHandle } from "../ActivityCard";
+import ActivityCarousel, {
+  type ActivityCarouselHandle,
+} from "../ActivityCarousel";
 import ActivitySelector from "../ActivitySelector";
+
+const SNAP_DELAY = 500;
 
 const ActivityView = () => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
 
-  const { index, setIndex, handlePrev, handleNext } = useCarousel<undefined>(
-    Array.from({ length: ITEM_AMOUNT }),
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeIndexRef = useRef(0);
+  const rafRef = useRef(0);
+  const snapTimerRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const isSnappingRef = useRef(false);
+  const lastScrollValRef = useRef(0);
+  const spacerRef = useRef<HTMLElement | null>(null);
+
+  const carouselRef = useRef<ActivityCarouselHandle>(null);
+  const cardRef = useRef<ActivityCardHandle>(null);
+
+  // --------------------------- Scroll-driven sync ---------------------------
+  //region Scroll-driven sync
+
+  const scrollToIndex = useCallback((targetIndex: number) => {
+    const spacer = spacerRef.current;
+    if (!spacer) return;
+    isSnappingRef.current = true;
+    const spacerTop = spacer.getBoundingClientRect().top + window.scrollY;
+    const targetScroll =
+      spacerTop + (targetIndex / ITEM_AMOUNT) * spacer.offsetHeight;
+    window.scrollTo({ top: targetScroll, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    spacerRef.current = document.getElementById("activity-spacer");
+
+    const tick = () => {
+      const spacer = spacerRef.current;
+      if (!spacer) return;
+
+      const rect = spacer.getBoundingClientRect();
+      const rawProgress = Math.max(0, -rect.top / rect.height);
+      const scrollVal = Math.min(rawProgress * ITEM_AMOUNT, ITEM_AMOUNT - 1);
+
+      lastScrollValRef.current = scrollVal;
+
+      // Direct DOM updates — no React re-render
+      carouselRef.current?.updateProgress(scrollVal);
+      cardRef.current?.updateProgress(scrollVal);
+
+      // Only trigger React re-render when crossing an integer boundary
+      const newActive = Math.round(scrollVal);
+      if (newActive !== activeIndexRef.current) {
+        activeIndexRef.current = newActive;
+        setActiveIndex(newActive);
+      }
+    };
+
+    const handleScroll = () => {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(() => {
+        tick();
+
+        // Snap to nearest item when user stops scrolling
+        if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+        const scrollVal = lastScrollValRef.current;
+
+        if (scrollVal > 0 && scrollVal < ITEM_AMOUNT - 1) {
+          snapTimerRef.current = setTimeout(() => {
+            if (!isSnappingRef.current) {
+              const nearest = Math.round(scrollVal);
+              if (Math.abs(scrollVal - nearest) > 0.02) {
+                const spacer = spacerRef.current;
+                if (!spacer) return;
+                isSnappingRef.current = true;
+                const spacerTop =
+                  spacer.getBoundingClientRect().top + window.scrollY;
+                const targetScroll =
+                  spacerTop +
+                  (nearest / ITEM_AMOUNT) * spacer.offsetHeight;
+                window.scrollTo({ top: targetScroll, behavior: "smooth" });
+              }
+            }
+            isSnappingRef.current = false;
+          }, SNAP_DELAY);
+        } else {
+          isSnappingRef.current = false;
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    tick();
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafRef.current);
+      if (snapTimerRef.current) clearTimeout(snapTimerRef.current);
+    };
+  }, []);
+
+  // --------------------------- Handlers ---------------------------
+  //region Handlers
+
+  const handlePrev = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      if (activeIndex > 0) scrollToIndex(activeIndex - 1);
+    },
+    [activeIndex, scrollToIndex],
+  );
+
+  const handleNext = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      if (activeIndex < ITEM_AMOUNT - 1) scrollToIndex(activeIndex + 1);
+    },
+    [activeIndex, scrollToIndex],
   );
 
   // --------------------------- Renders ---------------------------
@@ -59,8 +169,8 @@ const ActivityView = () => {
           </Typography>
         </Stack>
         <Stack width={720} spacing={3.75} direction="row" alignItems="center">
-          <ActivityCarousel centerIndex={index} />
-          <ActivityCard key={index} centerIndex={index} />
+          <ActivityCarousel ref={carouselRef} activeIndex={activeIndex} />
+          <ActivityCard ref={cardRef} activeIndex={activeIndex} />
         </Stack>
 
         <Stack
@@ -83,7 +193,10 @@ const ActivityView = () => {
           >
             <ArrowUp />
           </GlassButton>
-          <ActivitySelector centerIndex={index} setCenterIndex={setIndex} />
+          <ActivitySelector
+            activeIndex={activeIndex}
+            onSelect={scrollToIndex}
+          />
           <GlassButton
             onClick={handleNext}
             borderRadius={6.25}

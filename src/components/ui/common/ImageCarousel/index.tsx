@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -34,9 +34,14 @@ const ImageCarousel = ({
       ? true
       : parentIndex === centerIndex;
 
+  // Reset image index only when this carousel goes from inactive to active
+  const wasActive = useRef(isActive);
   useEffect(() => {
-    if (centerIndex !== undefined) setIndex(0);
-  }, [centerIndex, setIndex]);
+    if (isActive && !wasActive.current) {
+      setIndex(0);
+    }
+    wasActive.current = isActive;
+  }, [isActive, setIndex]);
 
   // --------------------------- Renders ---------------------------
   //region Renders

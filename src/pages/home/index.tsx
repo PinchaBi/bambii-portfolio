@@ -1,3 +1,4 @@
+import { ITEM_AMOUNT } from "@/constants/activity";
 import { Box, Stack } from "@mui/material";
 
 import AboutView from "@/features/about/components/AboutView";
@@ -33,6 +34,11 @@ export default function HomePage() {
       <Box id="activity-view" sx={{ position: "sticky", top: 0, zIndex: 3 }}>
         <ActivityView />
       </Box>
+      {/* Scroll budget for activity carousel (each 100vh = one item transition + 100vh hold for last item) */}
+      <Box
+        id="activity-spacer"
+        sx={{ height: `${ITEM_AMOUNT * 100}vh`, position: "relative", zIndex: 3, pointerEvents: "none" }}
+      />
       <Box id="contact-view" sx={{ position: "sticky", top: 0, zIndex: 4 }}>
         <ContactView />
       </Box>

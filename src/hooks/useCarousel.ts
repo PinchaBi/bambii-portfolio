@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 const useCarousel = <T>(items: T[]) => {
   // --------------------------- Hooks ---------------------------
@@ -6,20 +6,28 @@ const useCarousel = <T>(items: T[]) => {
 
   const [index, setIndex] = useState<number>(0);
 
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
+  // --------------------------- Navigation ---------------------------
+  //region Navigation
+
+  const goNext = useCallback(() => {
+    setIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
+  }, [items.length]);
+
+  const goPrev = useCallback(() => {
+    setIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));
+  }, [items.length]);
 
   const handlePrev = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIndex((prev) => (prev === 0 ? items.length - 1 : index - 1));
+    goPrev();
   };
 
   const handleNext = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    setIndex((prev) => (prev === items.length - 1 ? 0 : index + 1));
+    goNext();
   };
 
-  return { index, setIndex, handlePrev, handleNext };
+  return { index, setIndex, handlePrev, handleNext, goNext, goPrev };
 };
 
 export default useCarousel;
