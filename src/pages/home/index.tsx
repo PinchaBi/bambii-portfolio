@@ -15,10 +15,10 @@ export default function HomePage() {
       <Box
         id="about-view"
         sx={{
-          position: "sticky",
           top: 0,
           zIndex: 1,
           height: "100vh",
+          position: "sticky",
           overflow: "hidden",
         }}
       >

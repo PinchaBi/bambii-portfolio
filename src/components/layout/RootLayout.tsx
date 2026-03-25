@@ -1,10 +1,10 @@
 import { useEffect, useLayoutEffect } from "react";
 
 import { Outlet, useLocation } from "react-router-dom";
-import { Toaster } from "sonner";
 
 import { colors } from "@/theme/theme";
 import { Stack } from "@mui/material";
+import { Toaster } from "sonner";
 
 import RevealCount from "../ui/RevealCount";
 import NavBar from "./NavBar";

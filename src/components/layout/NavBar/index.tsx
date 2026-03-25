@@ -18,26 +18,20 @@ const NavBar = () => {
   const { pathname } = useLocation();
 
   const [hasBorder, setHasBorder] = useState(true);
-  const [isInAboutView, setIsInAboutView] = useState(false);
   const [isInProjectView, setIsInProjectView] = useState(false);
   const [isInContactView, setIsInContactView] = useState(false);
   const [isInCUSocietyView, setIsInCUSocietyView] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const aboutSection = document.getElementById("about-view");
       const projectSection = document.getElementById("project-view");
       const contactSection = document.getElementById("contact-view");
       const cusocietySection = document.getElementById("cusociety-view");
 
-      const aboutRect = aboutSection?.getBoundingClientRect();
       const projectRect = projectSection?.getBoundingClientRect();
       const contactRect = contactSection?.getBoundingClientRect();
       const cusocietyRect = cusocietySection?.getBoundingClientRect();
 
-      const inAboutView = aboutRect
-        ? aboutRect.top < 20 && aboutRect.bottom > 20
-        : false;
       const inProjectView = projectRect
         ? projectRect.top < 20 && projectRect.bottom > 20
         : false;
@@ -50,7 +44,6 @@ const NavBar = () => {
           cusocietyRect.bottom < window.innerHeight + 65
         : false;
 
-      setIsInAboutView(inAboutView);
       setIsInProjectView(inProjectView);
       setIsInContactView(inContactView);
       setIsInCUSocietyView(inCUSocietyView);
