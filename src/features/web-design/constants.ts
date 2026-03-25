@@ -80,8 +80,8 @@ const veranapressItems: DisplayItem[] = [
   {
     image: "/images/web-design/verana/verana_main.png",
     video: "/videos/web-design/verana/verana_main.mp4",
-    width: 459,
-    height: 295,
+    width: 410,
+    height: 264,
     device: DEVICE.M,
     place: { x: 20, y: 70, z: 1 },
     haveVideo: true,
@@ -409,4 +409,17 @@ export const webDesignList: Record<number, WebDesignItem> = {
       "Created an interactive tool that promotes empathy through simulation",
     items: blindviewItems,
   },
+};
+
+// ─── Hero rect captured at click time (before overlay mounts) ───
+
+type HeroRect = { top: number; left: number; width: number; height: number };
+let _pendingHeroRect: HeroRect | null = null;
+export const captureHeroRect = (rect: HeroRect) => {
+  _pendingHeroRect = rect;
+};
+export const consumeHeroRect = (): HeroRect | null => {
+  const r = _pendingHeroRect;
+  _pendingHeroRect = null;
+  return r;
 };

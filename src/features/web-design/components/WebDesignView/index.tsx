@@ -2,7 +2,11 @@ import Wrapper from "@/components/layout/Wrapper";
 
 import WebDesignList from "../WebDesignList";
 
-const WebDesignView = () => {
+type WebDesignViewProps = {
+  hiddenHeroId: string | null;
+};
+
+const WebDesignView = ({ hiddenHeroId }: WebDesignViewProps) => {
   // --------------------------- Renders ---------------------------
   //region Renders
 
@@ -16,7 +20,7 @@ const WebDesignView = () => {
         overflowY: "hidden",
       }}
     >
-      <WebDesignList />
+      <WebDesignList hiddenHeroId={hiddenHeroId} />
     </Wrapper>
   );
 };

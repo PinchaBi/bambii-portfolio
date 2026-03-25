@@ -1,24 +1,33 @@
 import { useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 import { ITEM_AMOUNT } from "@/constants/web-design";
 import { Box, Stack, Typography } from "@mui/material";
 
-import { DEVICE, webDesignList } from "../../constants";
+import { captureHeroRect, DEVICE, webDesignList } from "../../constants";
 import Display from "../Display";
 
-const WebDesignList = () => {
+type WebDesignListProps = {
+  hiddenHeroId: string | null;
+};
+
+const WebDesignList = ({ hiddenHeroId }: WebDesignListProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   // --------------------------- Handlers ---------------------------
   //region Handlers
 
   const enterItem = (id: number) => {
-    navigate(`/web-design/${id}`);
+    const el = document.querySelector(`[data-hero-id="${id}"]`);
+    if (el) {
+      const r = el.getBoundingClientRect();
+      captureHeroRect({ top: r.top, left: r.left, width: r.width, height: r.height });
+    }
+    setSearchParams({ project: String(id) });
   };
 
   // --------------------------- Renders ---------------------------
@@ -45,6 +54,7 @@ const WebDesignList = () => {
         const { width, height, ...mainItem } = items[0];
 
         const isIphone = mainItem.device === DEVICE.I;
+        const isHidden = hiddenHeroId === String(index + 1);
 
         const stackWidth = isIphone ? 240 : 500;
         const boxWidth = isIphone ? 165 : 468;
@@ -121,15 +131,24 @@ const WebDesignList = () => {
                 transform: isHovered ? "translateY(-30px) scale(1.3)" : "none",
               }}
             >
-              <Display
-                {...mainItem}
-                isHovered={isHovered}
-                width={mainWidth}
-                height={mainHeight}
-                display="flex"
-                position="relative"
-                justifyContent="center"
-              />
+              <Box
+                data-hero-id={index + 1}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  visibility: isHidden ? "hidden" : "visible",
+                }}
+              >
+                <Display
+                  {...mainItem}
+                  isHovered={isHovered}
+                  width={mainWidth}
+                  height={mainHeight}
+                  display="flex"
+                  position="relative"
+                  justifyContent="center"
+                />
+              </Box>
             </Box>
           </Stack>
         );
