@@ -1,9 +1,11 @@
 import { useCallback, useRef, useState } from "react";
 
 import useRevealStore from "@/stores/revealStore";
+import { Box } from "@mui/material";
 import { AnimatePresence, motion } from "motion/react";
 
 import DotGrid from "@/components/animate-ui/DotGrid";
+import Footer from "@/components/layout/Footer";
 import Wrapper from "@/components/layout/Wrapper";
 
 import ContactBox from "../ContactBox";
@@ -97,7 +99,22 @@ const ContactView = () => {
       <ContactBox
         offset={isRevealed && isCursorInView ? boxOffset : { x: 0, y: 0 }}
         onHoverChange={handleBoxHover}
+        sx={{
+          zIndex: 1,
+        }}
       />
+
+      <Box
+        pb={3}
+        left={0}
+        right={0}
+        bottom={0}
+        zIndex={0}
+        position="absolute"
+        px={{ xs: 3, sm: 6 }}
+      >
+        <Footer />
+      </Box>
     </Wrapper>
   );
 };

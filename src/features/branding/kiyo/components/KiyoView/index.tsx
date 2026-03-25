@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import { motion, useInView } from "motion/react";
 
+import Footer from "@/components/layout/Footer";
 import Wrapper from "@/components/layout/Wrapper";
 
 import { kiyoList } from "../../constants";
@@ -138,6 +139,18 @@ const KiyoView = () => {
           </Stack>
         </Stack>
       </motion.div>
+
+      <Box
+        pb={3}
+        left={0}
+        right={0}
+        bottom={0}
+        zIndex={0}
+        position="absolute"
+        px={{ xs: 3, sm: 6 }}
+      >
+        <Footer />
+      </Box>
     </Wrapper>
   );
 };
