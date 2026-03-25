@@ -1,4 +1,29 @@
+export const DEVICE = {
+  M: "macbook",
+  I: "iphone",
+} as const;
+export type DeviceType = (typeof DEVICE)[keyof typeof DEVICE];
+
+export type Place = {
+  x: string | number;
+  y: string | number;
+  z: string | number;
+};
+
+export type DisplayItem = {
+  image: string;
+  video?: string;
+  width: number;
+  height: number;
+  place: Place;
+  device: DeviceType;
+  haveVideo: boolean;
+  haveFrame: boolean;
+};
+
 export type WebDesignItem = {
+  width: number;
+  height: number;
   name: string;
   title: string;
   subTitle: string;
@@ -7,19 +32,234 @@ export type WebDesignItem = {
   solutions: string[];
   keyThinkings: string[];
   outcome: string;
-  images: string[];
+  items: DisplayItem[];
 };
 
-const firstList: string[] = [];
-const secondList: string[] = [];
-const thirdList: string[] = [];
-const fourthList: string[] = [];
-const fifthList: string[] = [];
-const sixthList: string[] = [];
-const seventhList: string[] = [];
+const dentasuitItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/denta/denta_main.png",
+    video: "/videos/web-design/denta/denta_main.mp4",
+    width: 332,
+    height: 214,
+    device: DEVICE.M,
+    place: { x: 100, y: 120, z: 2 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/denta/denta_diagnosis-tx-list-add.png",
+    width: 250,
+    height: 161,
+    device: DEVICE.M,
+    place: { x: 20, y: 0, z: 3 },
+    haveVideo: false,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/denta/denta_addPatient.png",
+    video: "/videos/web-design/denta/denta_addPatient.mp4",
+    width: 180,
+    height: 113,
+    device: DEVICE.M,
+    place: { x: 385, y: 50, z: 1 },
+    haveVideo: true,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/denta/denta_dashboard.png",
+    width: 270,
+    height: 171,
+    device: DEVICE.M,
+    place: { x: 300, y: 300, z: 4 },
+    haveVideo: false,
+    haveFrame: false,
+  },
+];
+
+const veranapressItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/verana/verana_main.png",
+    video: "/videos/web-design/verana/verana_main.mp4",
+    width: 459,
+    height: 295,
+    device: DEVICE.M,
+    place: { x: 20, y: 70, z: 1 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/verana/verana_admin.png",
+    video: "/videos/web-design/verana/verana_admin.mp4",
+    width: 260,
+    height: 171,
+    device: DEVICE.M,
+    place: { x: -20, y: 280, z: 2 },
+    haveVideo: true,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/verana/verana_phone.png",
+    width: 108,
+    height: 234,
+    device: DEVICE.I,
+    place: { x: 400, y: 220, z: 3 },
+    haveVideo: false,
+    haveFrame: true,
+  },
+];
+
+const cuconnexItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/cuconnex/CUconnex_main.png",
+    video: "/videos/web-design/cuconnex/CUconnex_main.mp4",
+    width: 153,
+    height: 332,
+    device: DEVICE.I,
+    place: { x: 200, y: 20, z: 3 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/cuconnex/CUconnex_challenge.png",
+    width: 108,
+    height: 234,
+    device: DEVICE.I,
+    place: { x: 70, y: 200, z: 1 },
+    haveVideo: false,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/cuconnex/CUconnex_mac.png",
+    width: 330,
+    height: 212,
+    device: DEVICE.M,
+    place: { x: 240, y: 200, z: 2 },
+    haveVideo: false,
+    haveFrame: true,
+  },
+];
+
+const horoscopeItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/horo/horo_main.png",
+    video: "/videos/web-design/horo/horo_main.mp4",
+    width: 153,
+    height: 332,
+    device: DEVICE.I,
+    place: { x: 130, y: 0, z: 3 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/horo/horo_fortune.png",
+    video: "/videos/web-design/horo/horo_fortune.mp4",
+    width: 153,
+    height: 332,
+    device: DEVICE.I,
+    place: { x: 330, y: 0, z: 4 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/horo/horo_home.png",
+    width: 113,
+    height: 246,
+    device: DEVICE.I,
+    place: { x: 110, y: 150, z: 1 },
+    haveVideo: false,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/horo/horo_weekly.png",
+    width: 113,
+    height: 246,
+    device: DEVICE.I,
+    place: { x: 450, y: -50, z: 2 },
+    haveVideo: false,
+    haveFrame: false,
+  },
+];
+
+const sermkrangkitItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/skk/SKK_main.png",
+    video: "/videos/web-design/skk/SKK_main.mp4",
+    width: 420,
+    height: 262,
+    device: DEVICE.M,
+    place: { x: 50, y: 50, z: 1 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+];
+
+const flickfinderItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/flickfinder/flickFD_main.png",
+    video: "/videos/web-design/flickfinder/flickFD_main.mp4",
+    width: 335,
+    height: 215,
+    device: DEVICE.M,
+    place: { x: 90, y: 65, z: 2 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/flickfinder/flickFD_top.png",
+    width: 168,
+    height: 113,
+    device: DEVICE.M,
+    place: { x: 60, y: 0, z: 1 },
+    haveVideo: false,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/flickfinder/flickFD_bottom.png",
+    video: "/videos/web-design/flickfinder/flickFD_bottom.mp4",
+    width: 231,
+    height: 155,
+    device: DEVICE.M,
+    place: { x: 350, y: 215, z: 3 },
+    haveVideo: true,
+    haveFrame: false,
+  },
+];
+
+const blindviewItems: DisplayItem[] = [
+  {
+    image: "/images/web-design/blind-view/Blind_main.png",
+    video: "/videos/web-design/blind-view/blind_main.mp4",
+    width: 153,
+    height: 332,
+    device: DEVICE.I,
+    place: { x: 50, y: 0, z: 1 },
+    haveVideo: true,
+    haveFrame: true,
+  },
+  {
+    image: "/images/web-design/blind-view/Blind_1.png",
+    width: 143,
+    height: 310,
+    device: DEVICE.I,
+    place: { x: 270, y: 10, z: 2 },
+    haveVideo: true,
+    haveFrame: false,
+  },
+  {
+    image: "/images/web-design/blind-view/Blind_2.png",
+    width: 143,
+    height: 310,
+    device: DEVICE.I,
+    place: { x: 450, y: 10, z: 3 },
+    haveVideo: true,
+    haveFrame: false,
+  },
+];
 
 export const webDesignList: Record<number, WebDesignItem> = {
   1: {
+    width: 348,
+    height: 224,
     name: "DentaSuite",
     title:
       "Overlapping clinic operations across doctors, administrators, and front-desk staff led to duplicated data entry and coordination errors",
@@ -39,9 +279,11 @@ export const webDesignList: Record<number, WebDesignItem> = {
     ],
     outcome:
       "Delivered a centralized, production-ready system that improved cross-role coordination and reduced workflow friction",
-    images: firstList,
+    items: dentasuitItems,
   },
   2: {
+    width: 348,
+    height: 224,
     name: "VeranaPress",
     title:
       "High product customization complexity with dynamic pricing and dual-side (customer + admin) operational requirements",
@@ -61,9 +303,11 @@ export const webDesignList: Record<number, WebDesignItem> = {
     ],
     outcome:
       "Delivered scalable commerce ecosystem supporting revenue operations and internal workflows",
-    images: secondList,
+    items: veranapressItems,
   },
   3: {
+    width: 108,
+    height: 234,
     name: "CU CONNEX",
     title:
       "No structured mentorship, challenge participation, or intelligent student matching within existing application",
@@ -82,10 +326,12 @@ export const webDesignList: Record<number, WebDesignItem> = {
     ],
     outcome:
       "Successfully implemented feature inside live application environment",
-    images: thirdList,
+    items: cuconnexItems,
   },
   4: {
-    name: "Serm Krang Kit",
+    width: 108,
+    height: 234,
+    name: "Horoscope",
     title: "User confusion in overlapping dual-role journeys",
     subTitle: "2025 • Horoscope • UX/UI Designer",
     socialTitle: "Built to connect clients and fortune tellers seamlessly",
@@ -100,10 +346,12 @@ export const webDesignList: Record<number, WebDesignItem> = {
     ],
     outcome:
       "Delivered intuitive, separated experiences within a shared ecosystem",
-    images: fourthList,
+    items: horoscopeItems,
   },
   5: {
-    name: "Flick Finder",
+    width: 348,
+    height: 224,
+    name: "Serm Krang Kit",
     title:
       "Complex MDR cybersecurity services difficult to understand for clients",
     subTitle: "2024 • Serm Krang Kit • UX/UI Designer & Developer",
@@ -120,10 +368,12 @@ export const webDesignList: Record<number, WebDesignItem> = {
     ],
     keyThinkings: [],
     outcome: "Improved information clarity and professional positioning",
-    images: fifthList,
+    items: sermkrangkitItems,
   },
   6: {
-    name: "BlindView",
+    width: 348,
+    height: 224,
+    name: "Flick Finder",
     title:
       "Unstructured content reduces discoverability and browsing efficiency",
     subTitle: "2023 • Flick Finder • UX/UI Designer & Developer",
@@ -137,10 +387,12 @@ export const webDesignList: Record<number, WebDesignItem> = {
     keyThinkings: [],
     outcome:
       "Designed structured content categorization and scalable browsing system to support growing content library",
-    images: sixthList,
+    items: flickfinderItems,
   },
   7: {
-    name: "DentaSuite",
+    width: 108,
+    height: 234,
+    name: "BlindView",
     title: "Traditional awareness materials lack experiential engagement",
     subTitle: "2025 • BlindView • UX/UI Designer & Developer",
     socialTitle: "Built to foster empathy through interactive design",
@@ -155,6 +407,6 @@ export const webDesignList: Record<number, WebDesignItem> = {
     keyThinkings: [],
     outcome:
       "Created an interactive tool that promotes empathy through simulation",
-    images: seventhList,
+    items: blindviewItems,
   },
 };

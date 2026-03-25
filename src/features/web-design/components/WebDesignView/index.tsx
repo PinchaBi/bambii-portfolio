@@ -8,8 +8,7 @@ const WebDesignView = () => {
 
   return (
     <Wrapper
-      height="75vh"
-      paddingY={5}
+      height="65vh"
       alignItems="flex-start"
       justifyContent="flex-start"
       sx={{
