@@ -17,6 +17,7 @@
     "@motionone/utils": "^10.18.0",
     "@mui/icons-material": "^7.3.7",
     "@mui/material": "^7.3.7",
+    "@mui/system": "^7.3.9",
     "@react-three/drei": "^10.7.4",
     "@react-three/fiber": "^9.3.0",
     "@tailwindcss/vite": "^4.1.18",
@@ -41,6 +42,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "three": "^0.167.1",
+    "three-stdlib": "^2.36.1",
     "vite-tsconfig-paths": "^6.0.5",
     "zod": "^4.3.6",
     "zustand": "^5.0.10"
