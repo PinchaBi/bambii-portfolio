@@ -151,11 +151,11 @@ export const Experience = ({
 
       <OrbitControls enabled={isInteractive} enableZoom={false} />
 
-      <Environment preset="studio" />
+      <Environment preset="studio" environmentIntensity={0.5} />
 
       <directionalLight
-        position={[2, 5, 2]}
-        intensity={2.5}
+        position={[0, 5, 2]}
+        intensity={1.2}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
