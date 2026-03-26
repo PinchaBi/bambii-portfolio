@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import { colors } from "@/theme/theme";
 import { Stack } from "@mui/material";
+import { ReactLenis } from "lenis/react";
 import { Toaster } from "sonner";
 
 import RevealCount from "../ui/RevealCount";
@@ -34,11 +35,13 @@ export default function RootLayout() {
   //region Renders
 
   return (
-    <Stack width="100vw" bgcolor={colors.bambiiGray}>
-      <Toaster position="top-center" richColors />
-      <NavBar />
-      <Outlet />
-      <RevealCount />
-    </Stack>
+    <ReactLenis root options={{ lerp: 0.08, duration: 1.2, smoothWheel: true }}>
+      <Stack sx={{ width: "100vw", bgcolor: colors.bambiiGray }}>
+        <Toaster position="top-center" richColors />
+        <NavBar />
+        <Outlet />
+        <RevealCount />
+      </Stack>
+    </ReactLenis>
   );
 }
