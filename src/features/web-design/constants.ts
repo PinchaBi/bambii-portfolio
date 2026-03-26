@@ -1,3 +1,6 @@
+const BLOB_URL = import.meta.env.VITE_BLOB_URL || "";
+const blob = (path: string) => `${BLOB_URL}${path}`;
+
 export const DEVICE = {
   M: "macbook",
   I: "iphone",
@@ -38,7 +41,7 @@ export type WebDesignItem = {
 const dentasuitItems: DisplayItem[] = [
   {
     image: "/images/web-design/denta/denta_main.png",
-    video: "/videos/web-design/denta/denta_main.mp4",
+    video: blob("/videos/web-design/denta/denta_main.mp4"),
     width: 332,
     height: 214,
     device: DEVICE.M,
@@ -57,7 +60,7 @@ const dentasuitItems: DisplayItem[] = [
   },
   {
     image: "/images/web-design/denta/denta_addPatient.png",
-    video: "/videos/web-design/denta/denta_addPatient.mp4",
+    video: blob("/videos/web-design/denta/denta_addPatient.mp4"),
     width: 180,
     height: 113,
     device: DEVICE.M,
@@ -79,7 +82,7 @@ const dentasuitItems: DisplayItem[] = [
 const veranapressItems: DisplayItem[] = [
   {
     image: "/images/web-design/verana/verana_main.png",
-    video: "/videos/web-design/verana/verana_main.mp4",
+    video: blob("/videos/web-design/verana/verana_main.mp4"),
     width: 410,
     height: 264,
     device: DEVICE.M,
@@ -89,7 +92,7 @@ const veranapressItems: DisplayItem[] = [
   },
   {
     image: "/images/web-design/verana/verana_admin.png",
-    video: "/videos/web-design/verana/verana_admin.mp4",
+    video: blob("/videos/web-design/verana/verana_admin.mp4"),
     width: 260,
     height: 171,
     device: DEVICE.M,
@@ -111,7 +114,7 @@ const veranapressItems: DisplayItem[] = [
 const cuconnexItems: DisplayItem[] = [
   {
     image: "/images/web-design/cuconnex/CUconnex_main.png",
-    video: "/videos/web-design/cuconnex/CUconnex_main.mp4",
+    video: blob("/videos/web-design/cuconnex/CUconnex_main.mp4"),
     width: 153,
     height: 332,
     device: DEVICE.I,
@@ -142,7 +145,7 @@ const cuconnexItems: DisplayItem[] = [
 const horoscopeItems: DisplayItem[] = [
   {
     image: "/images/web-design/horo/horo_main.png",
-    video: "/videos/web-design/horo/horo_main.mp4",
+    video: blob("/videos/web-design/horo/horo_main.mp4"),
     width: 153,
     height: 332,
     device: DEVICE.I,
@@ -152,7 +155,7 @@ const horoscopeItems: DisplayItem[] = [
   },
   {
     image: "/images/web-design/horo/horo_fortune.png",
-    video: "/videos/web-design/horo/horo_fortune.mp4",
+    video: blob("/videos/web-design/horo/horo_fortune.mp4"),
     width: 153,
     height: 332,
     device: DEVICE.I,
@@ -183,7 +186,7 @@ const horoscopeItems: DisplayItem[] = [
 const sermkrangkitItems: DisplayItem[] = [
   {
     image: "/images/web-design/skk/SKK_main.png",
-    video: "/videos/web-design/skk/SKK_main.mp4",
+    video: blob("/videos/web-design/skk/SKK_main.mp4"),
     width: 420,
     height: 262,
     device: DEVICE.M,
@@ -196,7 +199,7 @@ const sermkrangkitItems: DisplayItem[] = [
 const flickfinderItems: DisplayItem[] = [
   {
     image: "/images/web-design/flickfinder/flickFD_main.png",
-    video: "/videos/web-design/flickfinder/flickFD_main.mp4",
+    video: blob("/videos/web-design/flickfinder/flickFD_main.mp4"),
     width: 335,
     height: 215,
     device: DEVICE.M,
@@ -215,7 +218,7 @@ const flickfinderItems: DisplayItem[] = [
   },
   {
     image: "/images/web-design/flickfinder/flickFD_bottom.png",
-    video: "/videos/web-design/flickfinder/flickFD_bottom.mp4",
+    video: blob("/videos/web-design/flickfinder/flickFD_bottom.mp4"),
     width: 231,
     height: 155,
     device: DEVICE.M,
@@ -228,7 +231,7 @@ const flickfinderItems: DisplayItem[] = [
 const blindviewItems: DisplayItem[] = [
   {
     image: "/images/web-design/blind-view/Blind_main.png",
-    video: "/videos/web-design/blind-view/blind_main.mp4",
+    video: blob("/videos/web-design/blind-view/blind_main.mp4"),
     width: 153,
     height: 332,
     device: DEVICE.I,

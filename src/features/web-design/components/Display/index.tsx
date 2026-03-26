@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Box } from "@mui/material";
 import type { BoxProps } from "@mui/material";
@@ -25,6 +25,7 @@ const Display = ({
   // --------------------------- Hooks ---------------------------
   //region Hooks
   const [showVideo, setShowVideo] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (!isHovered) {
@@ -41,6 +42,18 @@ const Display = ({
       };
     }
   }, [isHovered, haveVideo, video]);
+
+  // Play/pause video based on showVideo — catches autoplay errors
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+    if (showVideo) {
+      el.play().catch(() => {});
+    } else {
+      el.pause();
+      el.currentTime = 0;
+    }
+  }, [showVideo]);
 
   // --------------------------- Variables ---------------------------
   //region Variables
@@ -79,9 +92,9 @@ const Display = ({
         {/* Always mount video so it can preload/buffer from CDN */}
         {haveVideo && video && (
           <Box
+            ref={videoRef}
             src={video}
             component="video"
-            autoPlay
             muted
             loop
             playsInline

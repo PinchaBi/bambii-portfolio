@@ -1,10 +1,13 @@
 import type { ActivityType } from "./types";
 
+const BLOB_URL = import.meta.env.VITE_BLOB_URL || "";
+const blob = (path: string) => `${BLOB_URL}${path}`;
+
 const fwdImageList: string[] = [
   "/images/activity/1-FWD-The-Futurist-2023/1.jpg",
   "/images/activity/1-FWD-The-Futurist-2023/2.jpeg",
   "/images/activity/1-FWD-The-Futurist-2023/3.jpg",
-  "/images/activity/1-FWD-The-Futurist-2023/4.MOV",
+  blob("/images/activity/1-FWD-The-Futurist-2023/4.MOV"),
   "/images/activity/1-FWD-The-Futurist-2023/5.JPG",
 ];
 
@@ -36,7 +39,7 @@ const cunexImageList: string[] = [
   "/images/activity/5-CUNEX-Hackathon-2025/2.jpg",
   "/images/activity/5-CUNEX-Hackathon-2025/3.jpg",
   "/images/activity/5-CUNEX-Hackathon-2025/4.jpg",
-  "/images/activity/5-CUNEX-Hackathon-2025/5.MOV",
+  blob("/images/activity/5-CUNEX-Hackathon-2025/5.MOV"),
   "/images/activity/5-CUNEX-Hackathon-2025/6.jpg",
 ];
 
