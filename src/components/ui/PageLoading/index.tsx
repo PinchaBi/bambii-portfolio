@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 
 import { Box, Stack, Typography } from "@mui/material";
 import { motion } from "motion/react";
@@ -63,17 +63,6 @@ type PageLoadingProps = {
 };
 
 const PageLoading = ({ isLoading, title = "PORTFOLIO" }: PageLoadingProps) => {
-  const [animKey, setAnimKey] = useState(0);
-  const prevLoading = useRef(false);
-
-  // Increment key each time loading starts so all animations remount from scratch
-  useEffect(() => {
-    if (isLoading && !prevLoading.current) {
-      setAnimKey((k) => k + 1);
-    }
-    prevLoading.current = isLoading;
-  }, [isLoading]);
-
   // Lock page scroll while loading screen is visible
   useEffect(() => {
     document.body.style.overflow = isLoading ? "hidden" : "";
@@ -89,7 +78,7 @@ const PageLoading = ({ isLoading, title = "PORTFOLIO" }: PageLoadingProps) => {
         top: 0,
         left: 0,
         width: "100vw",
-        height: "100vh",
+        height: "100dvh",
         bgcolor: "black",
         display: "flex",
         alignItems: "center",
@@ -100,7 +89,7 @@ const PageLoading = ({ isLoading, title = "PORTFOLIO" }: PageLoadingProps) => {
         transition: isLoading ? "none" : "opacity 0.6s ease",
       }}
     >
-      <Stack key={animKey} alignItems="center" spacing={1}>
+      <Stack sx={{ alignItems: "center" }} spacing={1}>
         {/* B writing animation */}
         <Box sx={{ position: "relative", width: 120, height: 120 }}>
           {/* Gray ghost B — always visible as background */}

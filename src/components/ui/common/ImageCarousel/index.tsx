@@ -13,12 +13,14 @@ type ImageCarouselProps = {
   images: string[];
   centerIndex?: number;
   parentIndex?: number;
+  scale?: number;
 };
 
 const ImageCarousel = ({
   images,
   centerIndex,
   parentIndex,
+  scale = 1,
 }: ImageCarouselProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
@@ -43,6 +45,17 @@ const ImageCarousel = ({
     wasActive.current = isActive;
   }, [isActive, setIndex]);
 
+  // --------------------------- Derived sizes ---------------------------
+  //region Derived sizes
+
+  const iconSize = Math.round(24 * scale);
+  const btnPadding = 1.25 * scale;
+  const counterHeight = Math.round(18 * scale);
+  const counterFontSize = Math.round(12 * scale);
+  const dotSize = Math.max(3, Math.round(5 * scale));
+  const paddingX = 2 * scale;
+  const paddingY = 1.25 * scale;
+
   // --------------------------- Renders ---------------------------
   //region Renders
 
@@ -54,7 +67,7 @@ const ImageCarousel = ({
         overflow: "hidden",
         position: "relative",
         ".image-pagination": {
-          opacity: 0,
+          opacity: scale < 1 ? 1 : { xs: 1, md: 0 },
           transition: "opacity 0.3s ease-in-out",
         },
         "&:hover .image-pagination": {
@@ -107,8 +120,8 @@ const ImageCarousel = ({
         sx={{
           top: 0,
           inset: 0,
-          paddingX: 2,
-          paddingY: 1.25,
+          paddingX,
+          paddingY,
           display: "flex",
           position: "absolute",
           alignItems: "center",
@@ -116,21 +129,24 @@ const ImageCarousel = ({
         }}
       >
         <Box
-          zIndex={1}
-          width="100%"
-          height="18px"
-          display="flex"
-          alignItems="center"
-          justifyContent="flex-end"
+          sx={{
+            zIndex: 1,
+            width: "100%",
+            height: `${counterHeight}px`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+          }}
         >
           <Typography
             color="white"
-            height="18px"
-            variant="subtitle2"
             borderRadius={3.75}
             bgcolor="rgba(0, 0, 0, 0.55)"
             sx={{
-              px: 1,
+              px: 0.75 * scale,
+              height: `${counterHeight}px`,
+              fontSize: `${counterFontSize}px`,
+              lineHeight: `${counterHeight}px`,
             }}
           >
             {currentIndex + 1}/{images.length}
@@ -141,26 +157,26 @@ const ImageCarousel = ({
           <IconButton
             onClick={handlePrev}
             sx={{
-              padding: 1.25,
+              padding: btnPadding,
               color: "text.primary",
               transition: "all 0.3s ease",
               bgcolor: "rgba(255,255,255, 0.50)",
               "&:hover": { bgcolor: "white" },
             }}
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={iconSize} />
           </IconButton>
           <IconButton
             onClick={handleNext}
             sx={{
-              padding: 1.25,
+              padding: btnPadding,
               color: "text.primary",
               transition: "all 0.3s ease",
               bgcolor: "rgba(255,255,255, 0.50)",
               "&:hover": { bgcolor: "white" },
             }}
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={iconSize} />
           </IconButton>
         </Stack>
 
@@ -178,15 +194,15 @@ const ImageCarousel = ({
           mixBlendMode="screen"
           style={{ boxShadow: "0px 4px 24px -1px rgba(0, 0, 0, 0.2)" }}
         >
-          <Box gap={0.5} display="flex">
+          <Box gap={0.5 * scale} display="flex">
             {Array.from({ length: images.length }).map((_, index) => {
               return (
                 <Box
                   key={index}
                   onClick={() => setIndex(index)}
                   sx={{
-                    width: 5,
-                    height: 5,
+                    width: dotSize,
+                    height: dotSize,
                     cursor: "pointer",
                     borderRadius: "50%",
                     transition: "all 0.3s ease",

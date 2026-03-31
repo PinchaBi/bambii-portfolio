@@ -7,9 +7,10 @@ import ImageCarousel from "@/components/ui/common/ImageCarousel";
 
 type InstragarmCardProps = {
   images: string[];
+  size?: number;
 };
 
-const InstragramCard = ({ images }: InstragarmCardProps) => {
+const InstragramCard = ({ images, size = 220 }: InstragarmCardProps) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -18,14 +19,22 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
 
   const showGradient = isLiked || isHovered;
   const showBookmark = isBookmarked || isBookmarkHovered;
+
+  const scale = size / 220;
+  const iconSize = Math.round(18 * scale);
+  const avatarSize = Math.round(24 * scale);
+  const fontSize = Math.round(11 * scale);
+  const headerPadding = `${Math.round(8 * scale)}px ${Math.round(12 * scale)}px`;
+  const footerPadding = `${Math.round(12 * scale)}px`;
+
   // --------------------------- Renders ---------------------------
   //region Renders
 
   return (
     <Box
-      width={295}
+      width={size}
       bgcolor="white"
-      borderRadius={5}
+      borderRadius={5 * scale}
       overflow="hidden"
       position="relative"
     >
@@ -40,15 +49,15 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
       </svg>
       <Stack
         direction="row"
-        padding="8px 12px"
+        padding={headerPadding}
         alignItems="center"
         justifyContent="space-between"
       >
-        <Stack spacing={1.25} direction="row" alignItems="center">
-          <Avatar sizes="30px" src="/images/beautiful-bambii.jpg" />
-          <Typography variant="button">Pincha Khongngoen</Typography>
+        <Stack spacing={1 * scale} direction="row" alignItems="center">
+          <Avatar sx={{ width: avatarSize, height: avatarSize }} src="/images/beautiful-bambii.jpg" />
+          <Typography variant="button" fontSize={fontSize}>Pincha Khongngoen</Typography>
         </Stack>
-        <Stack spacing={0.5} direction="row">
+        <Stack spacing={0.5 * scale} direction="row">
           <Box
             width={3}
             height={3}
@@ -69,16 +78,16 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
           />
         </Stack>
       </Stack>
-      <Box width={295} height={295} overflow="hidden">
-        <ImageCarousel images={images} />
+      <Box width={size} height={size} overflow="hidden">
+        <ImageCarousel images={images} scale={scale} />
       </Box>
       <Stack
-        padding="12px"
+        padding={footerPadding}
         direction="row"
         alignItems="center"
         justifyContent="space-between"
       >
-        <Stack spacing={1.25} direction="row">
+        <Stack spacing={1 * scale} direction="row">
           <Box
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -88,8 +97,8 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
             sx={{
               cursor: "pointer",
               position: "relative",
-              width: 24,
-              height: 24,
+              width: iconSize,
+              height: iconSize,
               transition: "transform 0.2s ease",
               "&:active": { transform: "scale(0.85)" },
             }}
@@ -104,7 +113,7 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
                 opacity: showGradient ? 0 : 1,
               }}
             >
-              <Heart size={24} />
+              <Heart size={iconSize} />
             </Box>
             <Box
               component="span"
@@ -117,14 +126,14 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
               }}
             >
               <Heart
-                size={24}
+                size={iconSize}
                 stroke={`url(#${gradientId})`}
                 fill={`url(#${gradientId})`}
               />
             </Box>
           </Box>
-          <MessageCircle size={24} />
-          <Send size={24} />
+          <MessageCircle size={iconSize} />
+          <Send size={iconSize} />
         </Stack>
         <Box
           onMouseEnter={() => setIsBookmarkHovered(true)}
@@ -140,7 +149,7 @@ const InstragramCard = ({ images }: InstragarmCardProps) => {
             "& path": { transition: "fill 0.3s ease" },
           }}
         >
-          <Bookmark size={24} fill={showBookmark ? "black" : "transparent"} />
+          <Bookmark size={iconSize} fill={showBookmark ? "black" : "transparent"} />
         </Box>
       </Stack>
     </Box>

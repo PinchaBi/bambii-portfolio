@@ -9,31 +9,31 @@ export const cusocietyList: CUSocietyItem[] = [
   {
     image: "/images/branding/3-Cu-society/1.jpg",
     size: 120,
-    x: 50,
+    x: 10,
     y: 50,
   },
   {
     image: "/images/branding/3-Cu-society/2.jpg",
     size: 120,
-    x: 100,
+    x: 90,
     y: 440,
   },
   {
     image: "/images/branding/3-Cu-society/3.jpg",
     size: 160,
-    x: 120,
+    x: 110,
     y: 200,
   },
   {
     image: "/images/branding/3-Cu-society/4.jpg",
     size: 76,
-    x: 10,
+    x: 0,
     y: 335,
   },
   {
     image: "/images/branding/3-Cu-society/5.jpg",
     size: 120,
-    x: 310,
+    x: 300,
     y: 150,
   },
 ];

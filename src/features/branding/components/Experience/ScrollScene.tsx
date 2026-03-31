@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 
 import { useGLTF } from "@react-three/drei";
@@ -28,12 +28,96 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
   const tl = useRef<gsap.core.Timeline>(null!);
 
   const smoothProgress = useRef(0);
+  // Track viewport width reactively
+  const [vw, setVw] = useState(window.innerWidth);
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Responsive: only shift phone on tablet (600-1199px)
+  const isMobile = vw < 600;
+  const isTablet = vw >= 600 && vw < 1200;
+  const isSmallTablet = vw >= 600 && vw < 900;
+  const isXsTablet = vw >= 600 && vw < 800;
+  const isXxsTablet = vw >= 600 && vw < 700;
+  const isLargeTablet = vw >= 1000 && vw < 1200;
+  const isSmallScreen = vw < 750;
+  // ── CUSociety section (progress 0–0.25) ──
+  const initialX = isMobile
+    ? 0.3
+    : isXxsTablet
+      ? 0.3
+      : isXsTablet
+        ? 0.3
+        : isSmallTablet
+          ? 0.3
+          : isTablet
+            ? 1
+            : 0;
+  const initialY = isMobile
+    ? -0.3
+    : isSmallTablet
+      ? -0.3
+      : isTablet
+        ? -0.5
+        : -1.2;
+  const initialScale = isMobile
+    ? 6
+    : isXxsTablet
+      ? 7
+      : isXsTablet
+        ? 8
+        : isSmallTablet
+          ? 9
+          : isTablet
+            ? 11
+            : 14;
+
+  // ── Elexir section (progress 0.25–0.75) ──
+  const elexirX = isMobile
+    ? 0
+    : isXxsTablet
+      ? -0.95
+      : isXsTablet
+        ? -1.0
+        : isSmallTablet
+          ? -1.05
+          : isLargeTablet
+            ? -1.3
+            : isTablet
+              ? -1.15
+              : -1.55;
+  const elexirY = isMobile
+    ? 0.8
+    : isXxsTablet
+      ? -0.5
+      : isXsTablet
+        ? -0.5
+        : isSmallTablet
+          ? -0.5
+          : isLargeTablet
+            ? -0.6
+            : isTablet
+              ? -0.55
+              : -0.6;
+  const elexirScale = isMobile
+    ? 9
+    : isSmallTablet
+      ? 9
+      : isLargeTablet
+        ? 12.5
+        : isTablet
+          ? 11
+          : 14;
 
   const cusocietyModel = useGLTF(IPHONE_MODELS[0]);
   const elexirModel = useGLTF(IPHONE_MODELS[1]);
   const kiyoModel = useGLTF(IPHONE_MODELS[2]);
 
-  useFrame((_, delta) => {
+  useFrame(({ invalidate }, delta) => {
+    invalidate();
     const target = scrollProgressRef.current ?? 0;
 
     // Framerate-independent exponential smoothing — eliminates jitter
@@ -60,8 +144,16 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
     tl.current = gsap.timeline();
 
     // Pin initial state at position 0
-    tl.current.set(groupRef.current.scale, { x: 14, y: 14, z: 14 }, 0);
-    tl.current.set(groupRef.current.position, { x: 0, y: -1.2, z: 0 }, 0);
+    tl.current.set(
+      groupRef.current.scale,
+      { x: initialScale, y: initialScale, z: initialScale },
+      0,
+    );
+    tl.current.set(
+      groupRef.current.position,
+      { x: initialX, y: initialY, z: 0 },
+      0,
+    );
     tl.current.set(groupRef.current.rotation, { x: 0, y: Math.PI, z: 0 }, 0);
 
     // ── Continuous tweens over the full 0→1 scroll range ──
@@ -74,65 +166,123 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
       0,
     );
 
-    // Scale: stay at 14 through CUSociety & Elexir, grow to 20 during Kiyo
+    // ── Scale ──
+    // CUSociety: hold at initialScale
+    // Elexir: transition to elexirScale
+    // Kiyo: grow to kiyoScale
+    const kiyoScale = isMobile ? 11 : isSmallTablet ? 13 : isTablet ? 16 : 20;
     tl.current.fromTo(
       groupRef.current.scale,
-      { x: 14, y: 14, z: 14 },
-      { duration: 0.25, x: 14, y: 14, z: 14, ease: "none" },
+      { x: initialScale, y: initialScale, z: initialScale },
+      {
+        duration: 0.25,
+        x: initialScale,
+        y: initialScale,
+        z: initialScale,
+        ease: "none",
+      },
       0,
     );
     tl.current.fromTo(
       groupRef.current.scale,
-      { x: 14, y: 14, z: 14 },
-      { duration: 0.25, x: 20, y: 20, z: 20, ease: "power1.inOut" },
-      0.75,
-    );
-
-    // Y position: stay during CUSociety, move up for Elexir, move down for Kiyo
-    tl.current.fromTo(
-      groupRef.current.position,
-      { y: -1.2 },
-      { duration: 0.25, y: -1.2, ease: "none" },
-      0,
-    );
-    tl.current.fromTo(
-      groupRef.current.position,
-      { y: -1.2 },
-      { duration: 0.5, y: -0.6, ease: "power1.inOut" },
+      { x: initialScale, y: initialScale, z: initialScale },
+      {
+        duration: 0.1,
+        x: elexirScale,
+        y: elexirScale,
+        z: elexirScale,
+        ease: "power1.inOut",
+      },
       0.25,
     );
     tl.current.fromTo(
-      groupRef.current.position,
-      { y: -0.6 },
-      { duration: 0.25, y: -2.2, ease: "power1.inOut" },
+      groupRef.current.scale,
+      { x: elexirScale, y: elexirScale, z: elexirScale },
+      {
+        duration: 0.4,
+        x: elexirScale,
+        y: elexirScale,
+        z: elexirScale,
+        ease: "none",
+      },
+      0.35,
+    );
+    tl.current.fromTo(
+      groupRef.current.scale,
+      { x: elexirScale, y: elexirScale, z: elexirScale },
+      {
+        duration: 0.25,
+        x: kiyoScale,
+        y: kiyoScale,
+        z: kiyoScale,
+        ease: "power1.inOut",
+      },
       0.75,
     );
 
-    // Horizontal drift: left during first half, back to center during second
+    // ── Y position ──
+    // CUSociety: hold at initialY
+    // Elexir: move to elexirY
+    // Kiyo: move down
     tl.current.fromTo(
       groupRef.current.position,
-      { x: 0 },
-      { duration: 0.5, x: -1.75, ease: "power1.inOut" },
+      { y: initialY },
+      { duration: 0.25, y: initialY, ease: "none" },
       0,
     );
     tl.current.fromTo(
       groupRef.current.position,
-      { x: -1.75 },
-      { duration: 0.5, x: 0, ease: "power1.inOut" },
+      { y: initialY },
+      { duration: 0.5, y: elexirY, ease: "power1.inOut" },
+      0.25,
+    );
+    const kiyoY = isMobile ? -0.5 : isSmallScreen ? -0.6 : -2.2;
+    const kiyoX = isSmallScreen ? 0 : 0;
+    tl.current.fromTo(
+      groupRef.current.position,
+      { y: elexirY },
+      { duration: 0.25, y: kiyoY, ease: "power1.inOut" },
+      0.75,
+    );
+
+    // ── X position ──
+    // CUSociety → Elexir: drift from initialX to elexirX
+    // Elexir → Kiyo: drift from elexirX back to center
+    tl.current.fromTo(
+      groupRef.current.position,
+      { x: initialX },
+      { duration: 0.5, x: elexirX, ease: "power1.inOut" },
+      0,
+    );
+    tl.current.fromTo(
+      groupRef.current.position,
+      { x: elexirX },
+      { duration: 0.5, x: kiyoX, ease: "power1.inOut" },
       0.5,
     );
 
     return () => {
       tl.current.kill();
     };
-  }, []);
+  }, [
+    initialX,
+    initialY,
+    initialScale,
+    isMobile,
+    isSmallScreen,
+    isSmallTablet,
+    isTablet,
+    elexirX,
+    elexirY,
+    elexirScale,
+  ]);
 
   return (
     <group
       ref={groupRef}
-      position={[0, -1.5, 0]}
+      position={[initialX, initialY, 0]}
       rotation={[0, Math.PI, 0]}
-      scale={14}
+      scale={initialScale}
     >
       {/* CU Society iPhone */}
       <group ref={cusocietyRef}>

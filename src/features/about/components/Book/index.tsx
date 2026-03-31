@@ -108,6 +108,7 @@ const Page = ({
   page,
   opened,
   bookClosed,
+  paused,
   ...props
 }: PageProps) => {
   const [picture, picture2, pictureRoughness] = useTexture(
@@ -177,8 +178,9 @@ const Page = ({
   const [highlighted, setHighlighted] = useState(false);
   useCursor(highlighted);
 
-  useFrame((_, delta) => {
-    if (!skinnedMeshRef.current) return;
+  useFrame(({ invalidate }, delta) => {
+    if (paused || !skinnedMeshRef.current) return;
+    invalidate();
 
     const mat = skinnedMeshRef.current.material as MeshStandardMaterial[];
     const emissiveIntensity = highlighted ? 0.22 : 0;
@@ -283,7 +285,7 @@ type BookProps = {
   [key: string]: unknown;
 };
 
-export const Book = ({ ...props }: BookProps) => {
+export const Book = ({ paused, ...props }: BookProps) => {
   const [page] = useAtom(pageAtom);
   const [delayedPage, setDelayedPage] = useState(page);
 
@@ -321,6 +323,7 @@ export const Book = ({ ...props }: BookProps) => {
           number={index}
           opened={delayedPage > index}
           bookClosed={delayedPage === 0 || delayedPage === pages.length}
+          paused={paused}
           {...pageData}
         />
       ))}

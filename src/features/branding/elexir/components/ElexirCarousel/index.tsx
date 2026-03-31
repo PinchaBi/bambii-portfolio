@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, useMediaQuery } from "@mui/material";
 
 import { elexirList } from "../../constants";
 import type { ElexirItem } from "../../constants";
@@ -9,6 +9,13 @@ const ElexirCarousel = () => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
   const [items, setItems] = useState<ElexirItem[]>(elexirList);
+  const isDesktop = useMediaQuery("(min-width:1200px)");
+  const isMobile = useMediaQuery("(max-width:599px)");
+  const isXsMobile = useMediaQuery("(max-width:399px)");
+  const isSmallMobile = useMediaQuery("(max-width:499px)");
+  const isSmallTablet = useMediaQuery(
+    "(min-width:600px) and (max-width:899px)",
+  );
 
   // --------------------------- Handlers ---------------------------
   //region Handlers
@@ -23,21 +30,40 @@ const ElexirCarousel = () => {
     });
   };
 
+  // --------------------------- Variables ---------------------------
+  //region Variables
+
+  const scale = isXsMobile
+    ? 0.32
+    : isSmallMobile
+      ? 0.42
+      : isMobile
+        ? 0.55
+        : isDesktop
+          ? 1
+          : isSmallTablet
+            ? 0.5
+            : 0.7;
+
+  const selectedW = 285 * scale;
+  const selectedH = 355 * scale;
+  const unselectedW = 135 * scale;
+  const unselectedH = 170 * scale;
+  const positions = [0, 260 * scale, 410 * scale, 560 * scale];
+
   // --------------------------- Renders ---------------------------
   //region Renders
 
   const getCardStyles = (index: number) => {
     const isSelected = index === 0;
 
-    const translateXValues = [0, 260, 410, 560];
-
     return {
       borderRadius: 2.5,
       objectFit: "cover",
       position: "absolute",
       zIndex: items.length - index,
-      width: isSelected ? 285 : 135,
-      height: isSelected ? 355 : 170,
+      width: isSelected ? selectedW : unselectedW,
+      height: isSelected ? selectedH : unselectedH,
       cursor: isSelected ? "default" : "pointer",
       boxShadow: isSelected
         ? "0px 8px 30px rgba(0, 0, 0, 0.25)"
@@ -52,20 +78,25 @@ const ElexirCarousel = () => {
       `,
       transform: isSelected
         ? "translateX(0px) translateY(0px) scale(1)"
-        : `translateX(${translateXValues[index]}px) translateY(0px) scale(1)`,
+        : `translateX(${positions[index]}px) translateY(0px) scale(1)`,
       "&:hover": isSelected
         ? {}
         : {
             opacity: 1,
             filter: "brightness(1)",
-            transform: `translateX(${translateXValues[index]}px) translateY(-8px) scale(1.05)`,
+            transform: `translateX(${positions[index]}px) translateY(-8px) scale(1.05)`,
             boxShadow: "0px 12px 24px rgba(0, 0, 0, 0.2)",
           },
     };
   };
 
   return (
-    <Stack width="100%" height={360} direction="row" alignItems="center">
+    <Stack
+      width="100%"
+      height={360 * scale}
+      direction="row"
+      alignItems="center"
+    >
       {items.map((elexir, index) => {
         const { id, image } = elexir;
 

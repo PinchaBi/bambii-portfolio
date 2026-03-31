@@ -4,18 +4,23 @@ type LinkBoxProps = {
   url: string;
   image: string;
   hoverBgColor: string;
+  size?: number;
 };
 
-const LinkBox = ({ url, image, hoverBgColor }: LinkBoxProps) => {
+const LinkBox = ({ url, image, hoverBgColor, size = 34 }: LinkBoxProps) => {
+  const iconSize = Math.round(size * 0.53);
+
   return (
     <Box
       onClick={() => window.open(url, "_blank")}
       sx={{
-        width: 34,
-        padding: 1,
-        height: 34,
+        width: size,
+        height: size,
         borderRadius: 2.5,
         cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         bgcolor: "colors.mediumGray",
         "&:hover": {
           bgcolor: hoverBgColor,
@@ -27,10 +32,9 @@ const LinkBox = ({ url, image, hoverBgColor }: LinkBoxProps) => {
         component="img"
         src={image}
         sx={{
-          width: 18,
-          height: 18,
+          width: iconSize,
+          height: iconSize,
           objectFit: "cover",
-          position: "absolute",
           transition: "opacity 0.2s ease-in-out",
         }}
       />

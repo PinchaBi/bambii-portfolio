@@ -30,8 +30,8 @@ const StackCardImage = ({ item, stack, index }: StackCardImageProps) => {
       draggable={false}
       onLoad={() => setLoaded(true)}
       sx={{
-        width: item.width,
-        height: item.height,
+        width: { xs: item.width * 0.45, sm: item.width * 0.55, lg: item.width * 0.7 },
+        height: { xs: item.height * 0.45, sm: item.height * 0.55, lg: item.height * 0.7 },
         borderRadius: 5,
         objectFit: "cover",
         userSelect: "none",

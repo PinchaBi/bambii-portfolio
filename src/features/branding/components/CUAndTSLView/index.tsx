@@ -77,12 +77,13 @@ const CUAndTSLView = ({ onLoaded }: CUAndTSLViewProps) => {
             position: "sticky",
             top: 0,
             width: "100vw",
-            height: "100vh",
+            height: "100dvh",
             zIndex: 10,
             pointerEvents: "none",
           }}
         >
           <Canvas
+            frameloop="demand"
             gl={{ alpha: true }}
             camera={{
               fov: 50,

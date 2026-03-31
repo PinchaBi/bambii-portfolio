@@ -106,7 +106,7 @@ const DesktopControls: FC<{
   zoomEnabled: boolean;
 }> = ({ pivot, min, max, zoomEnabled }) => {
   const ref = useRef<any>(null);
-  useFrame(() => ref.current?.target.copy(pivot));
+  useFrame(({ invalidate }) => { invalidate(); ref.current?.target.copy(pivot); });
   return (
     <OrbitControls
       ref={ref}
@@ -393,7 +393,8 @@ const ModelInner: FC<ModelInnerProps> = ({
     return () => window.removeEventListener("pointermove", mm);
   }, [enableMouseParallax, enableHoverRotation]);
 
-  useFrame((_, dt) => {
+  useFrame(({ invalidate }, dt) => {
+    invalidate();
     let need = false;
     cPar.current.x += (tPar.current.x - cPar.current.x) * PARALLAX_EASE;
     cPar.current.y += (tPar.current.y - cPar.current.y) * PARALLAX_EASE;

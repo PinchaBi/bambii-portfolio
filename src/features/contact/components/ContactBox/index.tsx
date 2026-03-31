@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import type { SxProps } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useForm } from "react-hook-form";
@@ -55,15 +55,19 @@ const TextFieldSx = {
 };
 
 type ContactBoxProps = {
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
   offset?: { x: number; y: number };
   onHoverChange?: (hovering: boolean) => void;
+  stackedContactInfo?: boolean;
+  compact?: boolean;
 };
 
 const ContactBox = ({
   sx,
   offset = { x: 0, y: 0 },
   onHoverChange,
+  stackedContactInfo = false,
+  compact = false,
 }: ContactBoxProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
@@ -128,34 +132,34 @@ const ContactBox = ({
         transition={{ type: "spring", stiffness: 120, damping: 20 }}
         onMouseEnter={() => onHoverChange?.(true)}
         onMouseLeave={() => onHoverChange?.(false)}
-        top={200}
-        left={770}
-        width={500}
-        spacing={2.5}
-        padding={3.75}
-        bgcolor="white"
-        borderRadius={5}
-        position="absolute"
-        sx={{ ...sx }}
+        spacing={compact ? 0.5 : { xs: 1, sm: 1.5 }}
+        sx={{
+          padding: compact ? 1 : { xs: 1.5, sm: 2.5 },
+          bgcolor: "white",
+          borderRadius: compact ? 3 : 5,
+          ...((sx ?? {}) as Record<string, unknown>),
+        }}
       >
-        <Typography variant="h2" fontSize={24}>
-          Let’s Talk!
+        <Typography variant="h2" fontSize={compact ? 16 : { xs: 20, sm: 24 }}>
+          Let's Talk!
         </Typography>
-        <Typography variant="caption" lineHeight="14px">
-          I’m always open to new ideas, collaborations, and opportunities. Feel
+        <Typography variant="caption" lineHeight={compact ? "12px" : "14px"} fontSize={compact ? 10 : { xs: 11, sm: 12 }}>
+          I'm always open to new ideas, collaborations, and opportunities. Feel
           free to drop me a message anytime.
         </Typography>
 
         <Stack
-          padding={2}
+          padding={compact ? 0.75 : { xs: 1, sm: 2 }}
           width="100%"
-          direction="row"
+          direction={stackedContactInfo ? "column" : "row"}
           borderRadius={2.5}
           bgcolor="colors.lightGray"
-          justifyContent="space-between"
+          justifyContent={stackedContactInfo ? "flex-start" : "space-between"}
+          alignItems={compact ? "center" : undefined}
+          spacing={stackedContactInfo ? 0.75 : 0}
         >
           <Stack>
-            <Typography variant="h4" fontSize={16}>
+            <Typography variant="h4" fontSize={compact ? 11 : { xs: 12, sm: 16 }}>
               Reach me at
             </Typography>
             <Stack
@@ -164,9 +168,9 @@ const ContactBox = ({
               target="_blank"
               rel="noopener noreferrer"
               direction="row"
-              alignItems="center"
-              color="colors.bambiiPink"
               sx={{
+                alignItems: "center",
+                color: "colors.bambiiPink",
                 textDecoration: "none",
                 position: "relative",
                 "&::after": {
@@ -184,50 +188,51 @@ const ContactBox = ({
                 },
               }}
             >
-              <Typography variant="h4" fontSize={16}>
+              <Typography variant="h4" fontSize={compact ? 11 : { xs: 12, sm: 16 }}>
                 bammbi.wws@gmail.com
               </Typography>
-              <ArrowUpRight size={20} />
+              <ArrowUpRight size={compact ? 14 : stackedContactInfo ? 16 : 20} />
             </Stack>
           </Stack>
-          <Stack spacing={1.25} direction="row" alignItems="center">
-            {/* Instragram Logo */}
+          <Stack spacing={compact ? 0.5 : 1} direction="row" sx={{ alignItems: "center" }}>
             <LinkBox
               url={INSTRAGRAM_LINK}
               hoverBgColor="colors.lightPink"
               image={"/images/contact/Instragram-logo.png"}
+              size={compact ? 24 : stackedContactInfo ? 28 : 34}
             />
-
-            {/* Line Logo */}
             <LinkBox
               url={LINE_LINK}
               hoverBgColor="colors.lightGreen"
               image={"/images/contact/Line-logo.png"}
+              size={compact ? 24 : stackedContactInfo ? 28 : 34}
             />
-
-            {/* Linked in Logo */}
             <LinkBox
               url={LINKEDIN_LINK}
               hoverBgColor="colors.lightBlue"
               image={"/images/contact/Linked-in-logo.png"}
+              size={compact ? 24 : stackedContactInfo ? 28 : 34}
             />
           </Stack>
         </Stack>
 
-        <Divider
+        <Divider sx={{ fontSize: compact ? 9 : { xs: 10, sm: 12 }, fontWeight: 400 }}>OR</Divider>
+        <Stack
+          spacing={compact ? 0.5 : { xs: 1, sm: 2.5 }}
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
           sx={{
-            fontSize: 12,
-            fontWeight: 400,
+            ...((stackedContactInfo || compact) && {
+              "& .MuiInputBase-root:not(.MuiInputBase-multiline)": { height: compact ? 30 : 34 },
+              "& .MuiInputBase-input": { fontSize: compact ? 11 : 12 },
+            }),
           }}
         >
-          OR
-        </Divider>
-        <Stack spacing={2.5} component="form" onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={1.25}>
-            <Typography variant="h4" fontSize={16}>
+          <Stack spacing={compact ? 0.5 : { xs: 0.75, sm: 1 }}>
+            <Typography variant="h4" fontSize={compact ? 11 : { xs: 13, sm: 16 }}>
               Leave me a message below
             </Typography>
-            <Stack spacing={1.25} direction="row">
+            <Stack spacing={compact ? 0.5 : { xs: 0.75, sm: 1.25 }} direction="row">
               <Stack width="100%">
                 <TextField
                   variant="outlined"
@@ -252,7 +257,7 @@ const ContactBox = ({
             <TextField
               variant="outlined"
               multiline
-              rows={4}
+              rows={compact ? 1 : stackedContactInfo ? 2 : 4}
               fullWidth
               sx={{
                 width: "100%",
@@ -286,7 +291,8 @@ const ContactBox = ({
               gap: 1.25,
               color: "white",
               borderRadius: 2.5,
-              padding: "10px 20px",
+              padding: compact ? "6px 16px" : "10px 20px",
+              fontSize: compact ? 12 : undefined,
               background:
                 "linear-gradient(to top right, #CC2C66, #F13A7D, #FFD9E7)",
               opacity: isLoading ? 0.7 : 1,

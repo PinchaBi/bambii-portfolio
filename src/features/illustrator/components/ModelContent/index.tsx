@@ -36,7 +36,8 @@ const AnimatedModel = ({
   const { scene } = useGLTF(modelPath);
   const groupRef = useRef<THREE.Group>(null);
 
-  useFrame(() => {
+  useFrame(({ invalidate }) => {
+    invalidate();
     const g = groupRef.current;
     if (!g) return;
     const tx = isActive ? targetX * DEG : 0;
@@ -80,7 +81,8 @@ const AutoResetControls = ({ hovered }: { hovered: boolean }) => {
     return () => clearTimeout(timer);
   }, [camera]);
 
-  useFrame(() => {
+  useFrame(({ invalidate }) => {
+    invalidate();
     if (!ready.current || hovered || !controlsRef.current) return;
     camera.position.lerp(defaultPos.current, LERP_SPEED);
     controlsRef.current.target.lerp(defaultTarget.current, LERP_SPEED);
@@ -158,7 +160,7 @@ const ModelContent = ({
         }
       }}
     >
-      <Canvas camera={{ position: [0, 0, -4], fov: 40 }}>
+      <Canvas frameloop="demand" camera={{ position: [0, 0, -4], fov: 40 }}>
         <ambientLight intensity={0.8} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
         <Environment preset="studio" />

@@ -1,8 +1,14 @@
 import { useState } from "react";
 
 import { Typography } from "@mui/material";
+import type { SxProps, Theme } from "@mui/material/styles";
 
-const ContactTitle = () => {
+type ContactTitleProps = {
+  sx?: SxProps<Theme>;
+  alwaysActive?: boolean;
+};
+
+const ContactTitle = ({ sx, alwaysActive = false }: ContactTitleProps) => {
   // --------------------------- Hooks ---------------------------
   //region Hooks
 
@@ -40,32 +46,28 @@ const ContactTitle = () => {
 
   return (
     <Typography
-      top={200}
-      left={270}
-      width={320}
       variant="h4"
-      fontSize={60}
       color="white"
-      position="absolute"
       sx={{
         ".turn-text": {
-          color: isTurn ? "white" : "colors.darkGray3",
+          color: alwaysActive || isTurn ? "white" : "colors.darkGray3",
           transition: "color 0.8s ease",
         },
         ".ideas-text": {
-          color: isIdea ? "white" : "colors.darkGray3",
+          color: alwaysActive || isIdea ? "white" : "colors.darkGray3",
           transition: "color 0.8s ease",
         },
         ".into-text": {
-          color: isInto ? "white" : "colors.darkGray3",
+          color: alwaysActive || isInto ? "white" : "colors.darkGray3",
           transition: "color 0.8s ease",
         },
         ".reality-text": {
           fontStyle: "italic",
-          color: isReality ? "colors.lightPink" : "colors.darkGray3",
+          color: alwaysActive || isReality ? "colors.lightPink" : "colors.darkGray3",
           fontFamily: "PlayfairDisplay",
           transition: "color 0.8s ease",
         },
+        ...((sx ?? {}) as Record<string, unknown>),
       }}
     >
       <span className="turn-text" onMouseEnter={onMouseEnter}>
@@ -74,6 +76,7 @@ const ContactTitle = () => {
       <span className="ideas-text" onMouseEnter={onMouseEnter}>
         Ideas
       </span>{" "}
+      <br />
       <span className="into-text" onMouseEnter={onMouseEnter}>
         Into
       </span>{" "}

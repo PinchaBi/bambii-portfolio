@@ -16,7 +16,7 @@ const Wrapper = forwardRef<
       ref={ref}
       id={id}
       width="100vw"
-      height="100vh"
+      minHeight="100dvh"
       position="relative"
       sx={{ scrollSnapAlign: "start", ...sx }}
       {...props}

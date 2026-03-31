@@ -20,25 +20,29 @@ type ExperienceProps = {
   isInteractive: boolean;
   onEntered?: () => void;
   shouldEnter: boolean;
+  paused?: boolean;
+  baseScale?: number;
+  cameraX?: number;
 };
 
 // ─── Camera controller ───
 
-const CameraController = ({ isInteractive }: { isInteractive: boolean }) => {
+const CameraController = ({ isInteractive, paused, cameraX = 0.64 }: { isInteractive: boolean; paused?: boolean; cameraX?: number }) => {
   const page = useAtomValue(pageAtom);
 
-  useFrame(({ camera }, delta) => {
-    // Only shift camera sideways once pages are actually open
+  useFrame(({ camera, invalidate }, delta) => {
+    if (paused) return;
     const hasOpenPages = isInteractive && page > 0;
     const targetPos: [number, number, number] = hasOpenPages
       ? [-0.5, 1, 4]
-      : [0.64, 0, 4];
+      : [cameraX, 0, 4];
     const lookAt: [number, number, number] = hasOpenPages
       ? [0, BOOK_REST_Y, 0]
-      : [0.64, BOOK_REST_Y, 0];
+      : [cameraX, BOOK_REST_Y, 0];
     easing.damp3(camera.position, targetPos, 0.6, delta);
     camera.lookAt(...lookAt);
     camera.updateProjectionMatrix();
+    invalidate();
   });
   return null;
 };
@@ -49,12 +53,16 @@ type BookEntranceProps = {
   isInteractive: boolean;
   onEntered?: () => void;
   shouldEnter: boolean;
+  paused?: boolean;
+  baseScale?: number;
 };
 
 const BookEntrance = ({
   isInteractive,
   onEntered,
   shouldEnter,
+  paused,
+  baseScale = 1,
 }: BookEntranceProps) => {
   const groupRef = useRef<Group>(null!);
   const floatGroupRef = useRef<Group>(null!);
@@ -64,12 +72,15 @@ const BookEntrance = ({
   const page = useAtomValue(pageAtom);
 
   useFrame((state, delta) => {
-    if (!groupRef.current) return;
+    if (paused || !groupRef.current) return;
+
+    const { invalidate } = state;
 
     // ── Entrance: set start position on first frame ──
     if (!initialized.current) {
       groupRef.current.position.y = -5;
       initialized.current = true;
+      invalidate();
       return;
     }
 
@@ -96,8 +107,8 @@ const BookEntrance = ({
       onEntered?.();
     }
 
-    // ── Scale: larger when interactive ──
-    const targetScale = isInteractive ? 1.3 : 1;
+    // ── Scale: larger when interactive, responsive via baseScale ──
+    const targetScale = isInteractive ? 1.3 * baseScale : baseScale;
     easing.damp3(
       groupRef.current.scale,
       [targetScale, targetScale, targetScale],
@@ -121,12 +132,14 @@ const BookEntrance = ({
       easing.dampAngle(floatGroupRef.current.rotation, "z", 0, 0.3, delta);
       easing.damp3(floatGroupRef.current.position, [0, 0, 0], 0.3, delta);
     }
+
+    invalidate();
   });
 
   return (
     <group ref={groupRef}>
       <group ref={floatGroupRef}>
-        <Book />
+        <Book paused={paused} />
       </group>
     </group>
   );
@@ -138,15 +151,20 @@ export const Experience = ({
   isInteractive,
   onEntered,
   shouldEnter,
+  paused,
+  baseScale,
+  cameraX,
 }: ExperienceProps) => {
   return (
     <>
-      <CameraController isInteractive={isInteractive} />
+      <CameraController isInteractive={isInteractive} paused={paused} cameraX={cameraX} />
 
       <BookEntrance
         isInteractive={isInteractive}
         onEntered={onEntered}
         shouldEnter={shouldEnter}
+        paused={paused}
+        baseScale={baseScale}
       />
 
       <OrbitControls enabled={isInteractive} enableZoom={false} />

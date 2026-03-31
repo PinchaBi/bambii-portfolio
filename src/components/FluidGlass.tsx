@@ -53,7 +53,7 @@ export default function FluidGlass({
   } = rawOverrides;
 
   return (
-    <Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
+    <Canvas frameloop="demand" camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>
       <ScrollControls damping={0.2} pages={3} distance={0.4}>
         {mode === "bar" && <NavItems items={navItems as NavItem[]} />}
         <Wrapper modeProps={modeProps}>
@@ -112,6 +112,7 @@ const ModeWrapper = memo(function ModeWrapper({
   }, [nodes, geometryKey]);
 
   useFrame((state, delta) => {
+    state.invalidate();
     const { gl, viewport, camera } = state;
     const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
 
@@ -251,7 +252,8 @@ function NavItems({ items }: { items: NavItem[] }) {
 
   const { spacing, fontSize } = DEVICE[device];
 
-  useFrame(() => {
+  useFrame(({ invalidate }) => {
+    invalidate();
     if (!group.current) return;
     const v = viewport.getCurrentViewport(camera, [0, 0, 15]);
     group.current.position.set(0, -v.height / 2 + 0.2, 15.1);

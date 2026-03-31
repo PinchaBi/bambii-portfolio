@@ -8,21 +8,49 @@ import { activityList } from "../../constants";
 type ActivitySelectorProps = {
   activeIndex: number;
   onSelect: (index: number) => void;
+  direction?: "vertical" | "horizontal";
+  thumbnailSize?: number;
+  spacing?: number;
 };
 
-const ActivitySelector = ({ activeIndex, onSelect }: ActivitySelectorProps) => {
+const ActivitySelector = ({
+  activeIndex,
+  onSelect,
+  direction = "vertical",
+  thumbnailSize,
+  spacing: spacingProp,
+}: ActivitySelectorProps) => {
   // --------------------------- Renders ---------------------------
   //region Renders
 
+  const isHorizontal = direction === "horizontal";
+  const size = thumbnailSize ?? (isHorizontal ? 80 : 70);
+  const vSize = thumbnailSize ?? 80;
+  const gap = spacingProp ?? 1.25;
+
   return (
-    <Stack width={70} height={440} position="relative" overflow="hidden">
+    <Stack
+      width={isHorizontal ? "100%" : size}
+      height={isHorizontal ? "auto" : "min(440px, 60dvh)"}
+      position="relative"
+      overflow="hidden"
+      direction={isHorizontal ? "row" : "column"}
+      sx={{
+        justifyContent: isHorizontal ? "center" : undefined,
+      }}
+    >
       <Stack
-        width={70}
-        spacing={1.25}
-        position="absolute"
+        width={isHorizontal ? "auto" : size}
+        spacing={gap}
+        direction={isHorizontal ? "row" : "column"}
+        position={isHorizontal ? "relative" : "absolute"}
         sx={{
-          transition: `all 0.3s cubic-bezier(0.4, 0, 0.2, 1)`,
-          transform: `translateY(-${Math.floor(activeIndex / 5) * 440}px)`,
+          transition: isHorizontal
+            ? undefined
+            : `all 0.3s cubic-bezier(0.4, 0, 0.2, 1)`,
+          transform: isHorizontal
+            ? undefined
+            : `translateY(-${Math.floor(activeIndex / 5) * 440}px)`,
         }}
       >
         {Array.from({ length: ITEM_AMOUNT }).map((_, index) => {
@@ -31,8 +59,8 @@ const ActivitySelector = ({ activeIndex, onSelect }: ActivitySelectorProps) => {
           return (
             <Box
               key={`${ITEM_AMOUNT - index}-${title}`}
-              width={70}
-              height={80}
+              width={size}
+              height={vSize}
               flexShrink={0}
               padding={0.75}
               borderRadius={2.5}

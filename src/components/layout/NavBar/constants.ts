@@ -16,3 +16,17 @@ export const menus: NavBarItemType[] = [
     hash: "#activity-view",
   },
 ];
+
+export const sidebarMenus: NavBarItemType[] = [
+  {
+    name: "About",
+  },
+  {
+    name: "Project",
+    hash: "#project-view",
+  },
+  {
+    name: "Activity",
+    hash: "#activity-view",
+  },
+];

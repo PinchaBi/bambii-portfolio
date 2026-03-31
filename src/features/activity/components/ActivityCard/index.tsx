@@ -14,10 +14,11 @@ export type ActivityCardHandle = {
 
 type ActivityCardProps = {
   activeIndex: number;
+  scale?: number;
 };
 
 const ActivityCard = forwardRef<ActivityCardHandle, ActivityCardProps>(
-  ({ activeIndex }, ref) => {
+  ({ activeIndex, scale }, ref) => {
     // --------------------------- Hooks ---------------------------
     //region Hooks
 
@@ -44,6 +45,7 @@ const ActivityCard = forwardRef<ActivityCardHandle, ActivityCardProps>(
     // --------------------------- Variables ---------------------------
     //region Variables
 
+    const s = scale ?? 1;
     const {
       title,
       period,
@@ -58,55 +60,64 @@ const ActivityCard = forwardRef<ActivityCardHandle, ActivityCardProps>(
 
     return (
       <Box
-        width={450}
-        height={290}
-        position="relative"
-        sx={{ pointerEvents: "none" }}
+        sx={{
+          width: "100%",
+          maxWidth: Math.round(450 * s),
+          aspectRatio: "450 / 290",
+          position: "relative",
+          pointerEvents: "none",
+        }}
       >
         <Stack
           ref={contentRef}
-          width="100%"
-          height="100%"
-          spacing={3.75}
-          justifyContent="center"
+          spacing={Math.max(0.5, 3.75 * s * s)}
           sx={{
+            width: "100%",
+            height: "100%",
+            justifyContent: "center",
             pointerEvents: "none",
             willChange: "opacity",
           }}
         >
           <Stack sx={{ pointerEvents: "auto" }}>
-            <Typography fontWeight={600} fontSize={20}>
+            <Typography sx={{ fontWeight: 600, fontSize: Math.round(20 * s), lineHeight: 1.3 }}>
               {title}
             </Typography>
-            <Typography variant="overline" lineHeight="14px">
+            <Typography sx={{ fontSize: Math.round(10 * s), lineHeight: "14px", letterSpacing: "0.08em", textTransform: "uppercase" }}>
               {period}
             </Typography>
           </Stack>
           <Typography
-            variant="caption"
-            lineHeight="16px"
-            sx={{ pointerEvents: "auto" }}
+            sx={{
+              fontSize: Math.round(12 * s),
+              lineHeight: `${Math.round(16 * s)}px`,
+              pointerEvents: "auto",
+            }}
           >
             {firstParagraph}
           </Typography>
           <Typography
-            variant="caption"
-            lineHeight="16px"
-            sx={{ pointerEvents: "auto" }}
+            sx={{
+              fontSize: Math.round(12 * s),
+              lineHeight: `${Math.round(16 * s)}px`,
+              pointerEvents: "auto",
+            }}
           >
             {secondParagraph}
           </Typography>
-          <Stack spacing={1.25} direction="row" sx={{ pointerEvents: "auto" }}>
+          <Stack spacing={s < 1 ? 0.75 : 1.25} direction="row" sx={{ pointerEvents: "auto" }}>
             <GlassButton
               onClick={() => setOpen(true)}
-              icon={<Users size={16} />}
+              icon={<Users size={s < 1 ? 12 : 16} />}
               text="Group Photo"
+              sx={s < 1 ? { fontSize: "10px", padding: "5px 10px", minWidth: 0, "& *": { fontSize: "10px" } } : undefined}
             />
 
             <GlassButton
               onClick={() => window.open(source, "_blank")}
-              icon={<ArrowUpRight size={16} />}
+              icon={<ArrowUpRight size={s < 1 ? 12 : 16} />}
               text="Source"
+              sx={s < 1 ? { fontSize: "10px", padding: "5px 10px", minWidth: 0, "& *": { fontSize: "10px" } } : undefined}
             />
           </Stack>
         </Stack>
@@ -151,7 +162,7 @@ const ActivityCard = forwardRef<ActivityCardHandle, ActivityCardProps>(
                 },
               }}
             >
-              <X size={20} />
+              <X size={Math.round(20 * s)} />
             </IconButton>
           </Box>
         </Fade>
