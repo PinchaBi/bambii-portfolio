@@ -1,22 +1,14 @@
-import { Stack, Typography, useMediaQuery } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import { motion } from "motion/react";
+
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import Wrapper from "@/components/layout/Wrapper";
 
 import ElexirCarousel from "../ElexirCarousel";
 
 const ElexirView = () => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
-  const isDesktop = useMediaQuery("(min-width:1200px)");
-  const isMobile = useMediaQuery("(max-width:599px)");
-  const isTablet = !isDesktop && !isMobile;
-  const isSmallTablet = useMediaQuery(
-    "(min-width:600px) and (max-width:899px)",
-  );
-
-  // --------------------------- Renders ---------------------------
-  //region Renders
+  const { isMobile, isDesktop } = useBreakpoint();
 
   return (
     <Wrapper
@@ -36,27 +28,24 @@ const ElexirView = () => {
           direction="row"
           alignItems="center"
           justifyContent="flex-end"
-          sx={{ px: isDesktop ? 0 : isMobile ? 3 : isSmallTablet ? 2 : 3 }}
+          sx={{ px: { xs: 3, sm: 2, md: 3, lg: 0 } }}
         >
           <Stack
-            spacing={isDesktop ? 7.5 : isMobile ? 2.5 : 5}
-            width={
-              isDesktop
-                ? 715
-                : isSmallTablet
-                  ? "65%"
-                  : isTablet
-                    ? "60%"
-                    : "100%"
-            }
-            sx={{ pt: isMobile ? "max(80px, 25dvh)" : 0 }}
+            spacing={{ xs: 2.5, sm: 5, lg: 7.5 }}
+            width={{
+              xs: "100%",
+              sm: "65%",
+              md: "60%",
+              lg: 715,
+            }}
+            sx={{ pt: { xs: "max(80px, 25dvh)", sm: 0 } }}
           >
             <ElexirCarousel />
             <Stack
-              spacing={isDesktop ? 3.75 : 2.5}
-              direction={isDesktop ? "row" : "column"}
+              spacing={{ xs: 2.5, lg: 3.75 }}
+              direction={{ xs: "column", lg: "row" }}
             >
-              <Stack width={isDesktop ? 345 : "100%"}>
+              <Stack width={{ xs: "100%", lg: 345 }}>
                 <Typography
                   component={motion.div}
                   initial={{ opacity: 0, y: 10 }}
@@ -75,7 +64,7 @@ const ElexirView = () => {
                   transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
                   viewport={{ amount: 0.3 }}
                   variant="h2"
-                  fontSize={isMobile ? 24 : 32}
+                  fontSize={{ xs: 24, lg: 32 }}
                 >
                   Designing clarity for a trust-based product
                 </Typography>
@@ -86,13 +75,13 @@ const ElexirView = () => {
                 whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5, ease: "easeOut", delay: 0.5 }}
                 viewport={{ amount: 0.3 }}
-                width={isDesktop ? 345 : "100%"}
+                width={{ xs: "100%", lg: 345 }}
                 variant="caption"
                 lineHeight="16px"
-                fontSize={isMobile ? 12 : undefined}
+                fontSize={{ xs: 12, lg: "inherit" }}
               >
-                Elexir is a migraine relief device imported from Korea,
-                requiring visuals that felt both trustworthy and informative.
+                Elexir is a migraine relief device imported from Korea, requiring
+                visuals that felt both trustworthy and informative.
                 <br />
                 <br />
                 The focus shifted from expressive branding to clear

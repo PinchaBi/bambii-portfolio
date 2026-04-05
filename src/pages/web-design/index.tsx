@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { useSearchParams } from "react-router-dom";
 
-import { Box, keyframes, Stack, Typography } from "@mui/material";
+import { Box, keyframes, Stack, Typography, useMediaQuery } from "@mui/material";
 import { ArrowRight } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 
@@ -31,6 +31,7 @@ export default function WebDesignPage() {
   //region Hooks
   const [searchParams] = useSearchParams();
   const selectedId = searchParams.get("project");
+  const isShortScreen = useMediaQuery("(max-height:500px)");
 
   // Tracks which hero to hide — persists through exit animation
   const [hiddenHeroId, setHiddenHeroId] = useState<string | null>(null);
@@ -55,9 +56,9 @@ export default function WebDesignPage() {
       <Stack>
         <PageLoading isLoading={isLoading} title="WEB DESIGN" />
         <Stack
-          spacing={2}
+          spacing={isShortScreen ? 1 : 2}
           width="100%"
-          height="15vh"
+          height={isShortScreen ? "10vh" : "15vh"}
           direction="row"
           alignItems="flex-end"
           justifyContent="center"
@@ -65,9 +66,9 @@ export default function WebDesignPage() {
         >
           {/* scroll title */}
           <Typography
-            fontSize={20}
+            fontSize={isShortScreen ? 12 : 20}
             sx={{
-              height: 24,
+              height: isShortScreen ? 16 : 24,
               alignItems: "center",
               display: { xs: "none", sm: "flex" },
               animation: `${blinkEffect} 2s infinite ease-in-out`,
@@ -76,9 +77,9 @@ export default function WebDesignPage() {
             Scroll to explore selected web experiences
           </Typography>
           <Typography
-            fontSize={20}
+            fontSize={isShortScreen ? 12 : 20}
             sx={{
-              height: 20,
+              height: isShortScreen ? 16 : 20,
               alignItems: "center",
               display: { xs: "flex", sm: "none" },
               animation: `${blinkEffect} 2s infinite ease-in-out`,
@@ -104,29 +105,31 @@ export default function WebDesignPage() {
           </Box>
         </Stack>
         <WebDesignView hiddenHeroId={hiddenHeroId} />
-        <Box height="10vh" display="flex" position="relative">
+        <Box height={isShortScreen ? "5vh" : "10vh"} display="flex" position="relative">
           <Typography
             bottom={0}
             variant="h2"
             width="100vw"
             position="absolute"
             px={{ xs: 3, sm: 6 }}
-            fontSize={{ xs: 36, sm: 64 }}
+            fontSize={isShortScreen ? 24 : { xs: 36, sm: 64 }}
           >
             WEB DESIGN
           </Typography>
         </Box>
-        <Box
-          pb={3}
-          left={0}
-          right={0}
-          bottom={0}
-          zIndex={0}
-          position="absolute"
-          px={{ xs: 3, sm: 6 }}
-        >
-          <Footer divider />
-        </Box>
+        {!isShortScreen && (
+          <Box
+            pb={3}
+            left={0}
+            right={0}
+            bottom={0}
+            zIndex={0}
+            position="absolute"
+            px={{ xs: 3, sm: 6 }}
+          >
+            <Footer />
+          </Box>
+        )}
       </Stack>
 
       {/* Overlay */}

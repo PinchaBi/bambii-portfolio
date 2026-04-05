@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { Box } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import type { BoxProps } from "@mui/material";
 
 import { DEVICE } from "../../constants";
@@ -22,13 +22,21 @@ const Display = ({
   isHovered,
   ...props
 }: DisplayProps) => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
+  const isTouch = useMediaQuery("(max-width:1199px)");
+
+  // On touch devices, always show video if available
+  const effectiveHovered = isTouch ? (haveVideo && !!video) : !!isHovered;
+
   const [showVideo, setShowVideo] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (!isHovered) {
+    if (isTouch && haveVideo && video) {
+      setShowVideo(true);
+      return;
+    }
+
+    if (!effectiveHovered) {
       const hideTimer = setTimeout(() => setShowVideo(false), 0);
       return () => clearTimeout(hideTimer);
     }
@@ -41,9 +49,8 @@ const Display = ({
         clearTimeout(stopTimer);
       };
     }
-  }, [isHovered, haveVideo, video]);
+  }, [effectiveHovered, haveVideo, video, isTouch]);
 
-  // Play/pause video based on showVideo — catches autoplay errors
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
@@ -55,16 +62,11 @@ const Display = ({
     }
   }, [showVideo]);
 
-  // --------------------------- Variables ---------------------------
-  //region Variables
   const isIphone = device === DEVICE.I;
 
   const frameSrc = isIphone
     ? "/assets/2d/iPhone-17-Pro.png"
     : "/assets/2d/M4-MacBook-Pro-Max.png";
-
-  // --------------------------- Renders ---------------------------
-  //region Renders
 
   return (
     <Box width="100%" height="100%" {...props}>
@@ -76,7 +78,6 @@ const Display = ({
         position="absolute"
         borderRadius={isIphone ? 4 : 1}
       >
-        {/* Always mount image */}
         <Box
           src={image}
           component="img"
@@ -89,7 +90,6 @@ const Display = ({
             transition: "opacity 0.3s ease",
           }}
         />
-        {/* Always mount video so it can preload/buffer from CDN */}
         {haveVideo && video && (
           <Box
             ref={videoRef}

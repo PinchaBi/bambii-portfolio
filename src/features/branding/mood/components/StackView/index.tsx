@@ -1,7 +1,9 @@
 import { useState } from "react";
 
-import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { motion } from "motion/react";
+
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import Wrapper from "@/components/layout/Wrapper";
 
@@ -10,44 +12,34 @@ import type { StackType } from "../../constants";
 import StackCard from "../StackCard";
 
 const StackView = () => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
-
   const [selectedStack, setSelectedStack] = useState<StackType>("social");
-  const isDesktop = useMediaQuery("(min-width:1200px)");
-  const isMobile = useMediaQuery("(max-width:599px)");
+  const { isMobile, isDesktop } = useBreakpoint();
 
-  // --------------------------- Renders ---------------------------
-  //region Renders
-
-  // Category selector
+  // ── Category selector ──
   const categorySelector = (
     <Stack
       direction={isDesktop ? "column" : "row"}
-      spacing={isMobile ? 2.5 : isDesktop ? 1.25 : 3}
-      width={isMobile ? "100%" : isDesktop ? 130 : "auto"}
+      spacing={{ xs: 2.5, sm: 3, lg: 1.25 }}
+      width={isDesktop ? 130 : isMobile ? "100%" : "auto"}
       justifyContent="center"
       alignSelf="center"
     >
-      {stackTitleList.map((cardTitle, index) => {
-        const { name, value } = cardTitle;
-
-        return (
-          <Typography
-            key={index}
-            variant="h4"
-            fontSize={16}
-            onClick={() => setSelectedStack(value)}
-            sx={{
-              color: selectedStack === value ? "black" : "colors.darkGray3",
-              cursor: "pointer",
-              transition: "all 0.2s ease",
-            }}
-          >
-            {name}
-          </Typography>
-        );
-      })}
+      {stackTitleList.map((cardTitle, index) => (
+        <Typography
+          key={index}
+          variant="h4"
+          fontSize={16}
+          onClick={() => setSelectedStack(cardTitle.value)}
+          sx={{
+            color:
+              selectedStack === cardTitle.value ? "black" : "colors.darkGray3",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+          }}
+        >
+          {cardTitle.name}
+        </Typography>
+      ))}
     </Stack>
   );
 
@@ -55,13 +47,11 @@ const StackView = () => {
     <Wrapper
       alignItems="center"
       justifyContent="center"
-      padding={
-        isMobile
-          ? "24px 24px"
-          : isDesktop
-            ? "0px 0px 100px 0px"
-            : "0px 60px 60px 60px"
-      }
+      sx={{
+        px: { xs: 3, sm: "60px", lg: 0 },
+        py: { xs: 3, sm: "60px", lg: 0 },
+        pb: { lg: "100px" },
+      }}
     >
       <motion.div
         initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
@@ -69,18 +59,19 @@ const StackView = () => {
         transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
       >
         <Stack
-          spacing={isMobile ? 1 : isDesktop ? 5 : 7}
+          spacing={{ xs: 1, lg: 5, sm: 7 }}
           alignItems={isMobile ? "flex-start" : "center"}
         >
           {/* Main content: text + cards */}
           <Stack
-            spacing={isMobile ? 1.5 : isDesktop ? 5 : 5}
+            spacing={{ xs: 1.5, sm: 5 }}
             direction={isMobile ? "column" : "row"}
             alignItems="center"
           >
+            {/* Text */}
             <Stack
               width={isMobile ? "100%" : isDesktop ? 395 : "40%"}
-              spacing={isMobile ? 1 : 3.75}
+              spacing={{ xs: 1, sm: 3.75 }}
               flexShrink={0}
             >
               <Stack spacing={0.625}>
@@ -91,7 +82,7 @@ const StackView = () => {
                   transition={{ duration: 0.4, ease: "easeOut", delay: 0.4 }}
                   variant="subtitle2"
                   color="colors.darkGray3"
-                  fontSize={isMobile ? 11 : undefined}
+                  fontSize={{ xs: 11, sm: "inherit" }}
                 >
                   2024 • MOOOOD • Freelance Designer
                 </Typography>
@@ -101,7 +92,7 @@ const StackView = () => {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ duration: 0.5, ease: "easeOut", delay: 0.6 }}
                   variant="h2"
-                  fontSize={isMobile ? 20 : isDesktop ? 32 : 26}
+                  fontSize={{ xs: 20, sm: 26, lg: 32 }}
                 >
                   From first opportunity to building visual consistency
                 </Typography>
@@ -112,8 +103,8 @@ const StackView = () => {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.5, ease: "easeOut", delay: 0.8 }}
                 variant="caption"
-                lineHeight={isMobile ? "13px" : "16px"}
-                fontSize={isMobile ? 10 : isDesktop ? undefined : 12}
+                lineHeight={{ xs: "13px", sm: "16px" }}
+                fontSize={{ xs: 10, sm: 12, lg: "inherit" }}
               >
                 What began as a small freelance referral became my first real
                 step into branding. At the time, I was still in university and
@@ -126,9 +117,14 @@ const StackView = () => {
               </Typography>
             </Stack>
 
+            {/* Card stack */}
             <Box
               width={isMobile ? "100%" : isDesktop ? 460 : "50%"}
-              height={isMobile ? "min(230px, 32dvh)" : isDesktop ? "min(430px, 50dvh)" : "min(350px, 40dvh)"}
+              height={{
+                xs: "min(230px, 32dvh)",
+                sm: "min(350px, 40dvh)",
+                lg: "min(430px, 50dvh)",
+              }}
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -136,16 +132,15 @@ const StackView = () => {
               <StackCard stack={selectedStack} />
             </Box>
 
-            {/* Desktop: category selector on the right */}
             {isDesktop && categorySelector}
           </Stack>
 
-          {/* Tablet/Mobile: category selector below, aligned under the card area */}
+          {/* Mobile/Tablet: category selector below */}
           {!isDesktop && (
             <Stack
               direction="row"
               width="100%"
-              justifyContent={isMobile ? "center" : "center"}
+              justifyContent="center"
               sx={{ pl: isMobile ? 0 : "40%" }}
             >
               {categorySelector}

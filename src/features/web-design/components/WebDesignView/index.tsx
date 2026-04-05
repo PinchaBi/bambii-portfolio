@@ -1,3 +1,5 @@
+import { Box, useMediaQuery } from "@mui/material";
+
 import Wrapper from "@/components/layout/Wrapper";
 
 import WebDesignList from "../WebDesignList";
@@ -7,12 +9,15 @@ type WebDesignViewProps = {
 };
 
 const WebDesignView = ({ hiddenHeroId }: WebDesignViewProps) => {
-  // --------------------------- Renders ---------------------------
-  //region Renders
+  const isShortScreen = useMediaQuery("(max-height:500px)");
+
+  // On short/landscape screens, scale the entire list uniformly
+  const scale = isShortScreen ? 0.6 : 1;
 
   return (
     <Wrapper
-      height="65vh"
+      height={isShortScreen ? "80vh" : "65vh"}
+      minHeight={isShortScreen ? "80vh" : "65vh"}
       alignItems="flex-start"
       justifyContent="flex-start"
       sx={{
@@ -20,7 +25,15 @@ const WebDesignView = ({ hiddenHeroId }: WebDesignViewProps) => {
         overflowY: "hidden",
       }}
     >
-      <WebDesignList hiddenHeroId={hiddenHeroId} />
+      <Box
+        sx={{
+          height: "100%",
+          transform: scale < 1 ? `scale(${scale})` : undefined,
+          transformOrigin: "bottom left",
+        }}
+      >
+        <WebDesignList hiddenHeroId={hiddenHeroId} />
+      </Box>
     </Wrapper>
   );
 };

@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 
-import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { motion, useInView } from "motion/react";
+
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import Wrapper from "@/components/layout/Wrapper";
 
@@ -13,7 +15,7 @@ const MotionImg = motion.create("img" as const);
 type CUSocietyImageProps = CUSocietyItem & {
   index: number;
   isInView: boolean;
-  scale: number;
+  containerWidth: number;
 };
 
 const CUSocietyImage = ({
@@ -23,9 +25,10 @@ const CUSocietyImage = ({
   y,
   index,
   isInView,
-  scale,
+  containerWidth,
 }: CUSocietyImageProps) => {
   const [hasEntered, setHasEntered] = useState(false);
+  const px = (pct: number) => (pct / 100) * containerWidth;
 
   return (
     <Box
@@ -53,10 +56,10 @@ const CUSocietyImage = ({
       whileHover={{ y: -8, scale: 1.05, zIndex: 10 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       sx={{
-        top: y * scale,
-        left: x * scale,
-        width: size * scale,
-        height: size * scale,
+        top: px(y),
+        left: px(x),
+        width: px(size),
+        height: px(size),
         zIndex: index,
         borderRadius: 2.5,
         objectFit: "cover",
@@ -66,34 +69,87 @@ const CUSocietyImage = ({
   );
 };
 
-const CUSocietyView = () => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
+// Container sizes per tier
+const CONTAINER_SIZES = { mobile: 220, tablet: 350, desktop: 600 } as const;
 
+const CUSocietyView = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
-  const isDesktop = useMediaQuery("(min-width:1200px)");
-  const isMobile = useMediaQuery("(max-width:599px)");
-  const isSmallTablet = useMediaQuery("(max-width:840px)");
+  const { isMobile, isTablet, isDesktop, tier } = useBreakpoint();
 
-  const imgScale = isMobile ? 0.5 : isSmallTablet ? 0.65 : isDesktop ? 1 : 0.85;
-  const containerSize = isMobile
-    ? "min(250px, 45dvh)"
-    : isSmallTablet
-      ? "min(350px, 50dvh)"
-      : isDesktop
-        ? "min(600px, 65dvh)"
-        : "min(480px, 55dvh)";
+  const containerSize = CONTAINER_SIZES[tier];
 
-  // --------------------------- Renders ---------------------------
-  //region Renders
+  // ── Shared text content ──
+  const textContent = (
+    <>
+      <Stack spacing={0.625}>
+        <Typography
+          component={motion.div}
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+          viewport={{ amount: 0.3 }}
+          variant="subtitle2"
+          color="colors.darkGray3"
+        >
+          2024• Cu.society • Co-founder & Brand Designer
+        </Typography>
+        <Typography
+          component={motion.div}
+          initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
+          viewport={{ amount: 0.3 }}
+          variant="h2"
+          fontSize={{ xs: 20, sm: 26, lg: 32 }}
+        >
+          Turning design into a revenue-driving brand
+        </Typography>
+      </Stack>
+      <Typography
+        component={motion.div}
+        initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+        whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ duration: 0.5, ease: "easeOut", delay: 0.5 }}
+        viewport={{ amount: 0.3 }}
+        variant="caption"
+        lineHeight="16px"
+        fontSize={{ xs: 11, sm: 12, lg: "inherit" }}
+      >
+        Cu.society was built from scratch as an apparel brand. I led the brand
+        identity, designed the products, planned the marketing direction, and
+        created launch content. <br />
+        <br />
+        Within the first month, the brand generated 130,000 THB in revenue. This
+        experience showed me how design, strategy, and execution work together
+        to drive real business results.
+      </Typography>
+    </>
+  );
+
+  // ── Image collage ──
+  const imageCollage = (
+    <Box
+      ref={containerRef}
+      width={containerSize}
+      height={containerSize}
+      position="relative"
+      flexShrink={0}
+    >
+      {cusocietyList.map((item, index) => (
+        <CUSocietyImage
+          key={index}
+          {...item}
+          index={index}
+          isInView={isInView}
+          containerWidth={containerSize}
+        />
+      ))}
+    </Box>
+  );
 
   return (
-    <Wrapper
-      bgcolor="black"
-      alignItems="center"
-      justifyContent={isMobile || isSmallTablet ? "stretch" : "center"}
-    >
+    <Wrapper bgcolor="black" alignItems="center">
       <motion.div
         initial={{ opacity: 0, y: 30, filter: "blur(10px)" }}
         whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -101,96 +157,57 @@ const CUSocietyView = () => {
         viewport={{ amount: 0.3 }}
         style={{
           width: "100%",
-          flex: isMobile || isSmallTablet ? 1 : undefined,
-          display: isMobile || isSmallTablet ? "flex" : undefined,
-          flexDirection: isMobile || isSmallTablet ? "column" : undefined,
+          ...(isMobile || isTablet
+            ? { flex: 1, display: "flex", flexDirection: "column" as const }
+            : {}),
         }}
       >
-        <Stack
-          width="100%"
-          flex={isDesktop ? undefined : 1}
-          direction={isDesktop ? "row" : "column"}
-          alignItems={isMobile ? "center" : isDesktop ? "center" : "flex-start"}
-          justifyContent={isDesktop ? "center" : "space-between"}
-          gap={isDesktop ? 25 : 0}
-          sx={{
-            px: isMobile ? 3 : isDesktop ? 0 : 6,
-            pt: isMobile ? "max(40px, 8dvh)" : isSmallTablet ? "max(30px, 5dvh)" : 0,
-          }}
-        >
-          <Box
-            ref={containerRef}
-            width={containerSize}
-            height={containerSize}
-            position="relative"
-            flexShrink={0}
-            sx={{
-              ml: isDesktop ? 0 : isMobile ? -5 : isSmallTablet ? 2 : 8,
-            }}
-          >
-            {cusocietyList.map((item, index) => (
-              <CUSocietyImage
-                key={index}
-                {...item}
-                index={index}
-                isInView={isInView}
-                scale={imgScale}
-              />
-            ))}
-          </Box>
+        {isDesktop ? (
+          /* ── Desktop: row layout, images left, text right ── */
           <Stack
-            width={isDesktop ? 395 : "100%"}
-            spacing={isMobile ? 1.5 : 3.75}
-            color="white"
+            width="100%"
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            gap={25}
+          >
+            {imageCollage}
+            <Stack width={395} spacing={3.75} color="white">
+              {textContent}
+            </Stack>
+          </Stack>
+        ) : (
+          /* ── Mobile & Tablet: column layout with space-between ── */
+          <Stack
+            width="100%"
+            flex={1}
+            direction="column"
+            justifyContent="space-between"
             sx={{
-              mt: isDesktop ? 0 : 0,
-              pb: isMobile ? 5 : isDesktop ? 0 : isSmallTablet ? 12 : 1,
+              px: { xs: 3, sm: 6 },
+              pt: { xs: "max(40px, 8dvh)", sm: "max(30px, 5dvh)" },
+              pb: { xs: 5, sm: 8 },
             }}
           >
-            <Stack spacing={0.625}>
-              <Typography
-                component={motion.div}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
-                viewport={{ amount: 0.3 }}
-                variant="subtitle2"
-                color="colors.darkGray3"
-              >
-                2024• Cu.society • Co-founder & Brand Designer
-              </Typography>
-              <Typography
-                component={motion.div}
-                initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
-                viewport={{ amount: 0.3 }}
-                variant="h2"
-                fontSize={isMobile ? 20 : 32}
-              >
-                Turning design into a revenue-driving brand
-              </Typography>
-            </Stack>
-            <Typography
-              component={motion.div}
-              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.5 }}
-              viewport={{ amount: 0.3 }}
-              variant="caption"
-              lineHeight="16px"
-              fontSize={isMobile ? 11 : undefined}
+            {/* Images at top */}
+            <Box
+              sx={{
+                ml: { xs: -5, sm: 2 },
+              }}
             >
-              Cu.society was built from scratch as an apparel brand. I led the
-              brand identity, designed the products, planned the marketing
-              direction, and created launch content. <br />
-              <br />
-              Within the first month, the brand generated 130,000 THB in
-              revenue. This experience showed me how design, strategy, and
-              execution work together to drive real business results.
-            </Typography>
+              {imageCollage}
+            </Box>
+
+            {/* Text at bottom */}
+            <Stack
+              width="100%"
+              spacing={1.5}
+              color="white"
+            >
+              {textContent}
+            </Stack>
           </Stack>
-        </Stack>
+        )}
       </motion.div>
     </Wrapper>
   );

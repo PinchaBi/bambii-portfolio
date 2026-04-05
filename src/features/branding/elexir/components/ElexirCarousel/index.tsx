@@ -1,24 +1,19 @@
 import { useState } from "react";
 
-import { Box, Stack, useMediaQuery } from "@mui/material";
+import { Box, Stack } from "@mui/material";
+
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import { elexirList } from "../../constants";
 import type { ElexirItem } from "../../constants";
 
-const ElexirCarousel = () => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
-  const [items, setItems] = useState<ElexirItem[]>(elexirList);
-  const isDesktop = useMediaQuery("(min-width:1200px)");
-  const isMobile = useMediaQuery("(max-width:599px)");
-  const isXsMobile = useMediaQuery("(max-width:399px)");
-  const isSmallMobile = useMediaQuery("(max-width:499px)");
-  const isSmallTablet = useMediaQuery(
-    "(min-width:600px) and (max-width:899px)",
-  );
+const SCALES = { mobile: 0.45, tablet: 0.65, desktop: 1 } as const;
 
-  // --------------------------- Handlers ---------------------------
-  //region Handlers
+const ElexirCarousel = () => {
+  const [items, setItems] = useState<ElexirItem[]>(elexirList);
+  const { tier } = useBreakpoint();
+
+  const scale = SCALES[tier];
 
   const handleSelect = (id: number) => {
     setItems((prev) => {
@@ -30,29 +25,11 @@ const ElexirCarousel = () => {
     });
   };
 
-  // --------------------------- Variables ---------------------------
-  //region Variables
-
-  const scale = isXsMobile
-    ? 0.32
-    : isSmallMobile
-      ? 0.42
-      : isMobile
-        ? 0.55
-        : isDesktop
-          ? 1
-          : isSmallTablet
-            ? 0.5
-            : 0.7;
-
   const selectedW = 285 * scale;
   const selectedH = 355 * scale;
   const unselectedW = 135 * scale;
   const unselectedH = 170 * scale;
   const positions = [0, 260 * scale, 410 * scale, 560 * scale];
-
-  // --------------------------- Renders ---------------------------
-  //region Renders
 
   const getCardStyles = (index: number) => {
     const isSelected = index === 0;

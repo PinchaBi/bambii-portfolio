@@ -1,18 +1,21 @@
-import { ITEM_AMOUNT_INSTRAGRAM } from "@/constants/branding";
-import { Box, Stack, useMediaQuery } from "@mui/material";
-import { keyframes } from "@mui/system";
 import { useMemo } from "react";
+
+import { Box, Stack } from "@mui/material";
+import { keyframes } from "@mui/system";
+
+import { ITEM_AMOUNT_INSTRAGRAM } from "@/constants/branding";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import { instragramList } from "../../constants";
 import InstragramCard from "../InstragramCard";
 
 const GAP = 20;
 
-const InstragramCarousel = () => {
-  const isMobile = useMediaQuery("(max-width:599px)");
-  const isSmallMobile = useMediaQuery("(max-width:399px)");
+const CARD_SIZES = { mobile: 160, tablet: 220, desktop: 220 } as const;
 
-  const cardSize = isSmallMobile ? 150 : isMobile ? 180 : 220;
+const InstragramCarousel = () => {
+  const { tier } = useBreakpoint();
+  const cardSize = CARD_SIZES[tier];
 
   const totalWidth =
     ITEM_AMOUNT_INSTRAGRAM * cardSize + ITEM_AMOUNT_INSTRAGRAM * GAP;
@@ -24,9 +27,6 @@ const InstragramCarousel = () => {
     `,
     [totalWidth],
   );
-
-  // --------------------------- Renders ---------------------------
-  //region Renders
 
   const renderCards = (keyPrefix: string) =>
     Array.from({ length: ITEM_AMOUNT_INSTRAGRAM }).map((_, index) => {
@@ -47,9 +47,7 @@ const InstragramCarousel = () => {
         sx={{
           width: "fit-content",
           animation: `${scroll} 40s linear infinite`,
-          "&:hover": {
-            animationPlayState: "paused",
-          },
+          "&:hover": { animationPlayState: "paused" },
         }}
       >
         {renderCards("a")}

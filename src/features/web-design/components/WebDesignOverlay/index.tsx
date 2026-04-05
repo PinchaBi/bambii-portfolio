@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useSearchParams } from "react-router-dom";
 
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 import { X } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -23,25 +23,41 @@ const CONTENT_DELAY = 0.25;
 const EASE: [number, number, number, number] = [0.25, 0.1, 0.25, 1];
 
 const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
-  // --------------------------- Hooks ---------------------------
-  //region Hooks
   const [, setSearchParams] = useSearchParams();
   const [heroLanded, setHeroLanded] = useState(false);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const displayAreaRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery("(min-width:1200px)");
 
-  // Enter source: captured at click time in WebDesignList, consumed here
-  // as initial state — no effect needed, no cascading render.
+  // Viewport-based scale for non-desktop
+  const [vw, setVw] = useState(window.innerWidth);
+  const [vh, setVh] = useState(window.innerHeight);
+  useEffect(() => {
+    const onResize = () => {
+      setVw(window.innerWidth);
+      setVh(window.innerHeight);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Display scale: fit 600×500 reference area into available space
+  // Use 55% of viewport height for display, leave 45% for text + close btn
+  // Also constrain by width with padding
+  const displayScale = isDesktop
+    ? 1
+    : Math.min(
+        (vw - 48) / 600, // fit width with 24px padding each side
+        (vh * 0.5) / 500, // fit into top 50% of viewport
+        1.2, // never exceed 1.2x even on huge tablets
+      );
+
   const [enterSource] = useState<Rect | null>(() => consumeHeroRect());
-
-  // Hero target + display area origin: measured after mount via rAF
   const [heroTarget, setHeroTarget] = useState<Rect | null>(null);
   const [displayAreaOrigin, setDisplayAreaOrigin] = useState<{
     top: number;
     left: number;
   } | null>(null);
-
-  // Exit source: measured after hover CSS transition settles
   const [exitSource, setExitSource] = useState<Rect | null>(null);
 
   useEffect(() => {
@@ -51,12 +67,52 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
     };
   }, []);
 
-  // ── Hero target: measure display area position ──
+  // Calculate bounding box of all items and center offset
+  const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });
+
   useEffect(() => {
     const frameId = requestAnimationFrame(() => {
       if (displayAreaRef.current) {
         const areaRect = displayAreaRef.current.getBoundingClientRect();
-        const hero = webDesignList[id].items[0];
+        const allItems = webDesignList[id].items;
+
+        // Calculate bounding box of all items in scaled coordinates
+        let minX = Infinity,
+          minY = Infinity,
+          maxX = -Infinity,
+          maxY = -Infinity;
+        for (const item of allItems) {
+          const isIp = item.device === DEVICE.I;
+          const iw = item.haveFrame
+            ? item.width * (isIp ? 1.37 : 1.33)
+            : item.width;
+          const ih = item.haveFrame
+            ? item.height * (isIp ? 1.15 : 1.27)
+            : item.height;
+          const ix = (item.place.x as number) * displayScale;
+          const iy = (item.place.y as number) * displayScale;
+          minX = Math.min(minX, ix);
+          minY = Math.min(minY, iy);
+          maxX = Math.max(maxX, ix + iw * displayScale);
+          maxY = Math.max(maxY, iy + ih * displayScale);
+        }
+
+        const groupW = maxX - minX;
+        const groupH = maxY - minY;
+
+        // Offset to center the group within the display area (non-desktop only)
+        const offsetX = isDesktop ? 0 : (areaRect.width - groupW) / 2 - minX;
+        const offsetY = isDesktop ? 0 : (areaRect.height - groupH) / 2 - minY;
+
+        setCenterOffset({ x: offsetX, y: offsetY });
+
+        setDisplayAreaOrigin({
+          top: areaRect.top,
+          left: areaRect.left,
+        });
+
+        // Hero target with centering offset applied
+        const hero = allItems[0];
         const isIphone = hero.device === DEVICE.I;
         const tw = hero.haveFrame
           ? hero.width * (isIphone ? 1.37 : 1.33)
@@ -64,22 +120,18 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
         const th = hero.haveFrame
           ? hero.height * (isIphone ? 1.15 : 1.27)
           : hero.height;
-        setDisplayAreaOrigin({
-          top: areaRect.top,
-          left: areaRect.left,
-        });
         setHeroTarget({
-          top: areaRect.top + (hero.place.y as number),
-          left: areaRect.left + (hero.place.x as number),
-          width: tw,
-          height: th,
+          top: areaRect.top + (hero.place.y as number) * displayScale + offsetY,
+          left:
+            areaRect.left + (hero.place.x as number) * displayScale + offsetX,
+          width: tw * displayScale,
+          height: th * displayScale,
         });
       }
     });
     return () => cancelAnimationFrame(frameId);
-  }, [id]);
+  }, [id, displayScale, isDesktop]);
 
-  // ── Exit source: measured AFTER the hover CSS transition completes ──
   useEffect(() => {
     const hero = webDesignList[id].items[0];
     const { width: mw, height: mh } = webDesignList[id];
@@ -102,8 +154,6 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
     return () => clearTimeout(timer);
   }, [id]);
 
-  // --------------------------- Variables ---------------------------
-  //region Variables
   const {
     title,
     subTitle,
@@ -117,7 +167,6 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
   const heroItem = items[0];
   const secondaryItems = items.slice(1);
 
-  // FLIP deltas (GPU-composited transforms only)
   const ready = enterSource && heroTarget;
   const exitRect = exitSource ?? enterSource;
 
@@ -133,35 +182,56 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
   const syExit =
     ready && exitRect ? exitRect.height / heroTarget.height : syEnter;
 
-  // --------------------------- Handlers ---------------------------
-  //region Handlers
+  // Text scale — use both vw and vh to ensure text fits in bottom half
+  // Reference: text needs ~450px height at scale 1
+  const textScale = isDesktop
+    ? 1
+    : Math.min(
+        vw / 800, // scale with width
+        (vh * 0.45) / 400, // fit in bottom 45% of viewport
+        1.2, // cap for large tablets
+      );
+
   const handleClose = () => {
     setHeroLanded(false);
     setSearchParams({});
   };
 
-  // --------------------------- Renders ---------------------------
-  //region Renders
+  // ── Text sections ──
+  const titleSize = isDesktop ? 24 : Math.max(14, 20 * textScale);
+  const labelSize = isDesktop ? 14 : Math.max(10, 12 * textScale);
+  const captionSize = isDesktop ? undefined : Math.max(10, 12 * textScale);
+  const subtitleSize = isDesktop ? 12 : Math.max(9, 11 * textScale);
 
   const textSections = [
-    <Stack key="title" spacing={1.25}>
-      <Typography variant="h2" fontSize={24}>
+    <Stack key="title" spacing={0.5 + 0.75 * textScale}>
+      <Typography variant="h2" fontSize={titleSize}>
         {title}
       </Typography>
-      <Typography variant="subtitle2" color="colors.darkGray3">
+      <Typography
+        variant="subtitle2"
+        color="colors.darkGray3"
+        fontSize={subtitleSize}
+      >
         {subTitle}
       </Typography>
     </Stack>,
     ...(constraints.length !== 0
       ? [
-          <Stack key="constraints" spacing={0.625}>
-            <Typography variant="h4" fontSize={14} color="colors.darkGray3">
+          <Stack key="constraints" spacing={0.5}>
+            <Typography
+              variant="h4"
+              fontSize={labelSize}
+              color="colors.darkGray3"
+            >
               Constaints
             </Typography>
-            <Box component="ul" sx={{ listStyleType: "disc", pl: 2.5, m: 0 }}>
+            <Box component="ul" sx={{ listStyleType: "disc", pl: 2, m: 0 }}>
               {constraints.map((item, index) => (
                 <Box component="li" key={index} sx={{ p: 0, m: 0 }}>
-                  <Typography variant="caption">{item}</Typography>
+                  <Typography variant="caption" fontSize={captionSize}>
+                    {item}
+                  </Typography>
                 </Box>
               ))}
             </Box>
@@ -170,14 +240,20 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
       : []),
     ...(solutions.length !== 0
       ? [
-          <Stack key="solutions" spacing={0.625}>
-            <Typography variant="h4" fontSize={14} color="colors.darkGray3">
+          <Stack key="solutions" spacing={0.5}>
+            <Typography
+              variant="h4"
+              fontSize={labelSize}
+              color="colors.darkGray3"
+            >
               Solution
             </Typography>
-            <Box component="ul" sx={{ listStyleType: "disc", pl: 2.5, m: 0 }}>
+            <Box component="ul" sx={{ listStyleType: "disc", pl: 2, m: 0 }}>
               {solutions.map((item, index) => (
                 <Box component="li" key={index} sx={{ p: 0, m: 0 }}>
-                  <Typography variant="caption">{item}</Typography>
+                  <Typography variant="caption" fontSize={captionSize}>
+                    {item}
+                  </Typography>
                 </Box>
               ))}
             </Box>
@@ -186,25 +262,31 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
       : []),
     ...(keyThinkings.length !== 0
       ? [
-          <Stack key="keyThinkings" spacing={0.625}>
-            <Typography variant="h4" fontSize={14} color="colors.darkGray3">
+          <Stack key="keyThinkings" spacing={0.5}>
+            <Typography
+              variant="h4"
+              fontSize={labelSize}
+              color="colors.darkGray3"
+            >
               Key Thinking
             </Typography>
-            <Box component="ul" sx={{ listStyleType: "disc", pl: 2.5, m: 0 }}>
+            <Box component="ul" sx={{ listStyleType: "disc", pl: 2, m: 0 }}>
               {keyThinkings.map((item, index) => (
                 <Box component="li" key={index} sx={{ p: 0, m: 0 }}>
-                  <Typography variant="caption">{item}</Typography>
+                  <Typography variant="caption" fontSize={captionSize}>
+                    {item}
+                  </Typography>
                 </Box>
               ))}
             </Box>
           </Stack>,
         ]
       : []),
-    <Stack key="outcome" spacing={0.625}>
-      <Typography variant="h4" fontSize={14} color="colors.darkGray3">
+    <Stack key="outcome" spacing={0.5}>
+      <Typography variant="h4" fontSize={labelSize} color="colors.darkGray3">
         Outcome
       </Typography>
-      <Typography variant="caption" lineHeight="17px">
+      <Typography variant="caption" lineHeight={1.4} fontSize={captionSize}>
         {outcome}
       </Typography>
     </Stack>,
@@ -227,48 +309,122 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
           zIndex: 1000,
           backgroundColor: "#FFFFFF",
           display: "flex",
-          alignItems: "center",
+          alignItems: isDesktop ? "center" : "flex-start",
           justifyContent: "center",
+          overflowY: "hidden",
         }}
       >
-        <Stack width={1200} direction="row" justifyContent="space-between">
-          <Stack width={450} spacing={2.5}>
-            {textSections.map((section, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 25 }}
-                animate={
-                  heroLanded
-                    ? {
-                        opacity: 1,
-                        y: 0,
-                        transition: {
-                          duration: 0.6,
-                          delay: CONTENT_DELAY + i * 0.12,
-                          ease: [0.25, 0.46, 0.45, 0.94],
-                        },
-                      }
-                    : { opacity: 0, y: 25 }
-                }
-                exit={{
-                  opacity: 0,
-                  y: 15,
-                  transition: { duration: 0.15, ease: "easeIn" },
+        {isDesktop ? (
+          /* ── Desktop: row layout (original) ── */
+          <Stack
+            width="100%"
+            maxWidth={1200}
+            direction="row"
+            justifyContent="space-between"
+            sx={{ px: 6 }}
+          >
+            <Stack width={450} spacing={2.5}>
+              {textSections.map((section, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 25 }}
+                  animate={
+                    heroLanded
+                      ? {
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            duration: 0.6,
+                            delay: CONTENT_DELAY + i * 0.12,
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                          },
+                        }
+                      : { opacity: 0, y: 25 }
+                  }
+                  exit={{
+                    opacity: 0,
+                    y: 15,
+                    transition: { duration: 0.15, ease: "easeIn" },
+                  }}
+                >
+                  {section}
+                </motion.div>
+              ))}
+            </Stack>
+            <Box
+              ref={displayAreaRef}
+              width={600}
+              height="100%"
+              position="relative"
+            />
+          </Stack>
+        ) : (
+          /* ── Tablet/Mobile: column, everything fits in viewport ── */
+          <Stack width="100%" height="100%" justifyContent="flex-start">
+            {/* Display area — centered, 55% of viewport, white bg covers scrolling text */}
+            <Box
+              width="100%"
+              sx={{ flex: "0 0 55%", pt: "60px", bgcolor: "white", zIndex: 1 }}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
+              <Box
+                ref={displayAreaRef}
+                width={600 * displayScale}
+                height={500 * displayScale}
+                position="relative"
+              />
+            </Box>
+
+            {/* Text — remaining 45%, centered vertically */}
+            <Box
+              sx={{
+                flex: 1,
+                overflowY: "auto",
+                overflowX: "hidden",
+                px: vw < 600 ? 3 : 5,
+              }}
+            >
+              <Stack
+                spacing={0.75 * textScale}
+                sx={{
+                  width: "100%",
+                  maxWidth: 600,
+                  mx: "auto",
+                  pb: 10,
                 }}
               >
-                {section}
-              </motion.div>
-            ))}
+                {textSections.map((section, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={
+                      heroLanded
+                        ? {
+                            opacity: 1,
+                            y: 0,
+                            transition: {
+                              duration: 0.5,
+                              delay: CONTENT_DELAY + i * 0.1,
+                              ease: [0.25, 0.46, 0.45, 0.94],
+                            },
+                          }
+                        : { opacity: 0, y: 20 }
+                    }
+                    exit={{
+                      opacity: 0,
+                      y: 10,
+                      transition: { duration: 0.12, ease: "easeIn" },
+                    }}
+                  >
+                    {section}
+                  </motion.div>
+                ))}
+              </Stack>
+            </Box>
           </Stack>
-
-          {/* Empty ref box for measuring display area position */}
-          <Box
-            ref={displayAreaRef}
-            width={600}
-            height="100%"
-            position="relative"
-          />
-        </Stack>
+        )}
 
         {/* Close button */}
         <motion.div
@@ -288,19 +444,18 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
             transition: { duration: 0.25 },
           }}
           style={{
-            position: "absolute",
+            position: "fixed",
             left: 0,
             right: 0,
-            bottom: 0,
-            height: 180,
+            bottom: isDesktop ? 40 : Math.max(20, vh * 0.03),
             display: "flex",
-            alignItems: "center",
             justifyContent: "center",
+            zIndex: 1020,
           }}
         >
           <Box
-            width={45}
-            height={45}
+            width={40}
+            height={40}
             display="flex"
             borderRadius="50%"
             alignItems="center"
@@ -320,7 +475,7 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
               },
             }}
           >
-            <X size={18} />
+            <X size={16} />
           </Box>
         </motion.div>
       </motion.div>
@@ -334,8 +489,8 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
 
           return (
             <motion.div
-              onMouseEnter={() => setHoverIndex(0)}
-              onMouseLeave={() => setHoverIndex(null)}
+              onMouseEnter={isDesktop ? () => setHoverIndex(0) : undefined}
+              onMouseLeave={isDesktop ? () => setHoverIndex(null) : undefined}
               initial={{
                 x: dxEnter,
                 y: dyEnter,
@@ -389,6 +544,8 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
               >
                 <Display
                   {...heroItem}
+                  width={heroItem.width * displayScale}
+                  height={heroItem.height * displayScale}
                   display="flex"
                   position="relative"
                   isHovered={isHeroHovered}
@@ -399,21 +556,28 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
           );
         })()}
 
-      {/* ── Layer 3: Secondary items (fixed, same stacking context as hero) ── */}
+      {/* ── Layer 3: Secondary items ── */}
       {displayAreaOrigin &&
         secondaryItems.map((item, index) => {
           const { width, height, place, device, haveFrame } = item;
           const isIphone = device === DEVICE.I;
-          const itemIdx = index + 1; // hero is 0
+          const itemIdx = index + 1;
           const isItemHovered = hoverIndex === itemIdx;
           const isAnyHovered = hoverIndex !== null;
           const isBlurred = isAnyHovered && !isItemHovered;
 
+          const scaledWidth =
+            (haveFrame ? width * (isIphone ? 1.37 : 1.33) : width) *
+            displayScale;
+          const scaledHeight =
+            (haveFrame ? height * (isIphone ? 1.15 : 1.27) : height) *
+            displayScale;
+
           return (
             <motion.div
               key={index}
-              onMouseEnter={() => setHoverIndex(itemIdx)}
-              onMouseLeave={() => setHoverIndex(null)}
+              onMouseEnter={isDesktop ? () => setHoverIndex(itemIdx) : undefined}
+              onMouseLeave={isDesktop ? () => setHoverIndex(null) : undefined}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={
                 heroLanded
@@ -435,12 +599,18 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
               }}
               style={{
                 position: "fixed",
-                top: displayAreaOrigin.top + (place.y as number),
-                left: displayAreaOrigin.left + (place.x as number),
+                top:
+                  displayAreaOrigin.top +
+                  (place.y as number) * displayScale +
+                  centerOffset.y,
+                left:
+                  displayAreaOrigin.left +
+                  (place.x as number) * displayScale +
+                  centerOffset.x,
                 zIndex: isItemHovered ? 1010 : 1000 + (place.z as number),
-                width: haveFrame ? width * (isIphone ? 1.37 : 1.33) : width,
-                height: haveFrame ? height * (isIphone ? 1.15 : 1.27) : height,
-                borderRadius: isIphone ? 16 : 4,
+                width: scaledWidth,
+                height: scaledHeight,
+                borderRadius: isIphone ? 16 * displayScale : 4,
               }}
             >
               <div
@@ -465,6 +635,8 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
               >
                 <Display
                   {...item}
+                  width={width * displayScale}
+                  height={height * displayScale}
                   display="flex"
                   position="relative"
                   isHovered={isItemHovered}

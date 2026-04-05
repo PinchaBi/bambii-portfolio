@@ -1,21 +1,21 @@
-import { useMediaQuery } from "@mui/material";
+import useBreakpoint from "@/hooks/useBreakpoint";
 
 import Wrapper from "@/components/layout/Wrapper";
 
 import InstragramCarousel from "../InstragramCarousel";
 
 const InstragramView = () => {
-  const isMobile = useMediaQuery("(max-width:599px)");
-
-  // --------------------------- Renders ---------------------------
-  //region Renders
+  const { isMobile } = useBreakpoint();
 
   return (
     <Wrapper
       height={isMobile ? "50vh" : "65vh"}
       minHeight={isMobile ? "auto" : undefined}
       overflow="hidden"
-      padding={isMobile ? "40px 0px 30px 0px" : "80px 0px 50px 0px"}
+      sx={{
+        pt: { xs: 5, sm: 10 },
+        pb: { xs: 4, sm: 6 },
+      }}
     >
       <InstragramCarousel />
     </Wrapper>

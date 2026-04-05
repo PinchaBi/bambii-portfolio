@@ -4,7 +4,7 @@ import { colors } from "@/theme/theme";
 import { Box, Button, Stack, Typography, useMediaQuery } from "@mui/material";
 import { Canvas } from "@react-three/fiber";
 import { useSetAtom } from "jotai";
-import { ArrowRight, Copy } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Copy } from "lucide-react";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 
 import DotGrid from "@/components/animate-ui/DotGrid";
@@ -65,7 +65,6 @@ type AboutViewProps = {
   paused?: boolean;
 };
 
-
 const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
   const isDesktop = useMediaQuery("(min-width:1200px)");
   const isMobile = useMediaQuery("(max-width:599px)");
@@ -86,6 +85,39 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
   const [isInteractive, setIsInteractive] = useState(false);
   const [bookShouldEnter, setBookShouldEnter] = useState(false);
   const setPage = useSetAtom(pageAtom);
+
+  // ── Mobile single-page navigation ──
+  // Steps: 0=closed(cover), 1=left page(p1), 2=right page(p2), 3=closed(back)
+  const [mobileStep, setMobileStep] = useState(0);
+  const totalSteps = 3; // 0,1,2,3
+
+  // Derive pageAtom and camera side from mobileStep
+  const mobileSide: "none" | "left" | "right" | "center" = !isMobile
+    ? "none"
+    : mobileStep === 1
+      ? "left"
+      : mobileStep === 2
+        ? "right"
+        : mobileStep === 3
+          ? "center"
+          : "none";
+
+  // Sync pageAtom when mobile step changes
+  useEffect(() => {
+    if (!isMobile) return;
+    if (mobileStep === 0) setPage(0);
+    else if (mobileStep === 1 || mobileStep === 2) setPage(1);
+    else if (mobileStep === 3) setPage(2);
+  }, [mobileStep, isMobile, setPage]);
+
+  // mobileStep is reset via the scroll handler below (not a separate effect)
+
+  const handleMobileNext = () => {
+    setMobileStep((s) => Math.min(s + 1, totalSteps));
+  };
+  const handleMobilePrev = () => {
+    setMobileStep((s) => Math.max(s - 1, 0));
+  };
 
   // Top text animates immediately; book enters after text finishes (~850ms)
   useEffect(() => {
@@ -118,7 +150,11 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
   // Scroll-driven interactivity — reversible
   useEffect(() => {
     return scrollYProgress.on("change", (v) => {
-      if (isPresenting) setIsInteractive(v > 0.08);
+      if (isPresenting) {
+        const interactive = v > 0.08;
+        setIsInteractive(interactive);
+        if (!interactive) setMobileStep(0);
+      }
     });
   }, [scrollYProgress, isPresenting]);
 
@@ -237,7 +273,7 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
             gl={{ alpha: true }}
             camera={{
               position: [0.64, 0, 4],
-              fov: isMobile ? 65 : isDesktop ? 45 : 55,
+              fov: isShortScreen ? 55 : isMobile ? 60 : isDesktop ? 45 : 50,
             }}
           >
             <Suspense fallback={null}>
@@ -247,25 +283,34 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
                 shouldEnter={bookShouldEnter}
                 paused={paused}
                 baseScale={(() => {
-                  // Scale based on the smaller dimension so the book
-                  // always fits regardless of screen shape
-                  const wScale = vw / 1440; // reference: 1440px desktop
-                  const hScale = vh / 900;  // reference: 900px desktop
-                  const base = Math.min(wScale, hScale);
+                  const wScale = vw / 1440;
+                  const hScale = vh / 900;
+                  const isLandscape = vw > vh;
+                  // In landscape, weight width more so the book doesn't shrink
+                  const base = isLandscape
+                    ? wScale * 0.8 + hScale * 0.6
+                    : wScale * 0.6 + hScale * 0.4;
 
                   if (isShortScreen) {
-                    return isInteractive ? base * 2.8 : base * 2;
+                    return isInteractive
+                      ? Math.max(base * 1.8, 0.6)
+                      : Math.max(base * 1.3, 0.5);
                   }
                   if (isMobile) {
-                    return base * 2.4;
+                    const t = Math.min(1, (vw - 320) / (599 - 320));
+                    // Cap height influence — tall phones get slightly smaller book
+                    const heightCap = vh > 800 ? 0.9 : 1;
+                    return (1.1 + t * 0.2) * heightCap;
                   }
                   if (isDesktop) {
-                    return base * 1.4;
+                    // 1200px → ~0.85, 1920px → ~1.05
+                    return Math.min(base * 1.05, 1.1);
                   }
-                  // tablet
-                  return base * 1.6;
+                  // tablet: 600px → ~0.7, 1199px → ~1.0
+                  return Math.min(Math.max(base * 1.1, 0.7), 1.0);
                 })()}
-                cameraX={isMobile ? 0.42 : isDesktop ? 0.65 : 0.5}
+                cameraX={isMobile ? 0.7 : isDesktop ? 0.65 : 0.5}
+                mobileSide={mobileSide}
               />
             </Suspense>
           </Canvas>
@@ -273,8 +318,83 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
       )}
 
       {/* ── Interaction blocker — absorbs clicks until interactive ── */}
-      {!isInteractive && (
+      {/* On mobile: always block direct book clicks (navigate via chevrons only) */}
+      {(!isInteractive || isMobile) && (
         <div style={{ position: "absolute", inset: 0, zIndex: 6 }} />
+      )}
+
+      {/* ── Mobile chevron navigation ── */}
+      {isMobile && isInteractive && (
+        <>
+          {/* Left chevron */}
+          {mobileStep > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "absolute",
+                left: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 20,
+              }}
+            >
+              <Box
+                onClick={handleMobilePrev}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  bgcolor: "rgba(0,0,0,0.3)",
+                  backdropFilter: "blur(8px)",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  "&:active": { transform: "scale(0.9)" },
+                }}
+              >
+                <ChevronLeft size={24} color="white" />
+              </Box>
+            </motion.div>
+          )}
+          {/* Right chevron */}
+          {mobileStep < totalSteps && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: "absolute",
+                right: 8,
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 20,
+              }}
+            >
+              <Box
+                onClick={handleMobileNext}
+                sx={{
+                  width: 40,
+                  height: 40,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  bgcolor: "rgba(0,0,0,0.3)",
+                  backdropFilter: "blur(8px)",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                  "&:active": { transform: "scale(0.9)" },
+                }}
+              >
+                <ChevronRight size={24} color="white" />
+              </Box>
+            </motion.div>
+          )}
+        </>
       )}
 
       {/* ── Top text — word-by-word reveal + scroll-driven exit ── */}
@@ -390,21 +510,21 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
                 transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 type="submit"
                 sx={{
-                  gap: 1.25,
+                  gap: 1,
                   color: "white",
                   borderRadius: 7.5,
                   padding: isShortScreen
                     ? "4px 10px"
                     : isMobile
-                      ? "6px 14px"
+                      ? "6px 12px"
                       : "10px 20px",
-                  fontSize: isShortScreen ? 10 : isMobile ? 12 : 14,
+                  fontSize: isShortScreen ? 10 : isMobile ? 11 : 14,
                   background:
                     "linear-gradient(to top right, #CC2C66, #F13A7D, #FFD9E7)",
                 }}
               >
                 Explore my work
-                <ArrowRight size={isShortScreen ? 14 : isMobile ? 16 : 24} />
+                <ArrowRight size={isShortScreen ? 12 : isMobile ? 14 : 20} />
               </Button>
             </motion.div>
             <motion.div
@@ -419,21 +539,19 @@ const AboutView = ({ deferCanvas = false, paused = false }: AboutViewProps) => {
               }}
             >
               <GlassButton
-                icon={<Copy size={isShortScreen ? 12 : isMobile ? 12 : 16} />}
+                icon={<Copy size={isShortScreen ? 12 : isMobile ? 14 : 20} />}
                 text="Copy email"
                 sx={{
                   height: "100%",
-                  fontSize: isShortScreen ? 10 : isMobile ? 10 : 12,
+                  fontSize: isShortScreen ? 10 : isMobile ? 11 : 14,
                   padding: isShortScreen
                     ? "4px 10px"
                     : isMobile
-                      ? "6px 10px"
-                      : undefined,
-                  "& *": isShortScreen
-                    ? { fontSize: 10 }
-                    : isMobile
-                      ? { fontSize: 10 }
-                      : undefined,
+                      ? "6px 12px"
+                      : "10px 20px",
+                  "& *": {
+                    fontSize: isShortScreen ? 10 : isMobile ? 11 : 14,
+                  },
                 }}
               />
             </motion.div>

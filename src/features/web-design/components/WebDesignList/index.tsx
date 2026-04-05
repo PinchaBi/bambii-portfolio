@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { ITEM_AMOUNT } from "@/constants/web-design";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
 
 import { captureHeroRect, DEVICE, webDesignList } from "../../constants";
 import Display from "../Display";
@@ -17,6 +17,7 @@ const WebDesignList = ({ hiddenHeroId }: WebDesignListProps) => {
   //region Hooks
   const [, setSearchParams] = useSearchParams();
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  const isTouch = useMediaQuery("(max-width:1199px)");
 
   // --------------------------- Handlers ---------------------------
   //region Handlers
@@ -76,8 +77,8 @@ const WebDesignList = ({ hiddenHeroId }: WebDesignListProps) => {
           <Stack
             key={index}
             onClick={() => enterItem(index + 1)}
-            onMouseEnter={() => setHoverIndex(index)}
-            onMouseLeave={() => setHoverIndex(null)}
+            onMouseEnter={isTouch ? undefined : () => setHoverIndex(index)}
+            onMouseLeave={isTouch ? undefined : () => setHoverIndex(null)}
             padding={2}
             width={stackWidth}
             textAlign="center"

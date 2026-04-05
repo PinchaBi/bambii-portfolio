@@ -11,7 +11,7 @@ const IllustratorView = ({ isLoading }: IllustratorViewProps) => {
   //region Renders
 
   return (
-    <Wrapper height="75vh" padding="40px 80px" alignItems="flex-end">
+    <Wrapper height="75vh" minHeight="75vh" padding="40px 80px" alignItems="flex-end">
       <IllustratorCanvas isLoading={isLoading} />
     </Wrapper>
   );

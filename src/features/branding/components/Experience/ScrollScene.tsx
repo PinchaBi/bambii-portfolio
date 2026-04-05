@@ -7,6 +7,12 @@ import gsap from "gsap";
 import { MathUtils } from "three";
 import type * as THREE from "three";
 
+// Linearly interpolate a value between two viewport widths
+const lerp = (minVw: number, maxVw: number, minVal: number, maxVal: number, vw: number) => {
+  const t = Math.max(0, Math.min(1, (vw - minVw) / (maxVw - minVw)));
+  return minVal + t * (maxVal - minVal);
+};
+
 const IPHONE_MODELS = [
   "/images/branding/3d/cusociety_Light.glb",
   "/images/branding/3d/elexir_Light.glb",
@@ -36,81 +42,45 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Responsive: only shift phone on tablet (600-1199px)
+  // Responsive — fluid interpolation based on viewport width
   const isMobile = vw < 600;
   const isTablet = vw >= 600 && vw < 1200;
-  const isSmallTablet = vw >= 600 && vw < 900;
-  const isXsTablet = vw >= 600 && vw < 800;
-  const isXxsTablet = vw >= 600 && vw < 700;
-  const isLargeTablet = vw >= 1000 && vw < 1200;
   const isSmallScreen = vw < 750;
+
   // ── CUSociety section (progress 0–0.25) ──
+  // Phone centered on the image collage area
   const initialX = isMobile
-    ? 0.3
-    : isXxsTablet
-      ? 0.3
-      : isXsTablet
-        ? 0.3
-        : isSmallTablet
-          ? 0.3
-          : isTablet
-            ? 1
-            : 0;
+    ? lerp(320, 599, 0.2, 0.3, vw)
+    : isTablet
+      ? lerp(600, 1199, 0.3, 0.8, vw)
+      : 0;
   const initialY = isMobile
-    ? -0.3
-    : isSmallTablet
-      ? -0.3
-      : isTablet
-        ? -0.5
-        : -1.2;
+    ? lerp(320, 599, -0.2, -0.3, vw)
+    : isTablet
+      ? lerp(600, 1199, -0.3, -0.6, vw)
+      : -1.2;
   const initialScale = isMobile
-    ? 6
-    : isXxsTablet
-      ? 7
-      : isXsTablet
-        ? 8
-        : isSmallTablet
-          ? 9
-          : isTablet
-            ? 11
-            : 14;
+    ? lerp(320, 599, 5, 7, vw)
+    : isTablet
+      ? lerp(600, 1199, 7, 12, vw)
+      : 14;
 
   // ── Elexir section (progress 0.25–0.75) ──
   const elexirX = isMobile
     ? 0
-    : isXxsTablet
-      ? -0.95
-      : isXsTablet
-        ? -1.0
-        : isSmallTablet
-          ? -1.05
-          : isLargeTablet
-            ? -1.3
-            : isTablet
-              ? -1.15
-              : -1.55;
+    : isTablet
+      ? lerp(600, 1199, -0.8, -1.4, vw)
+      : -1.55;
   const elexirY = isMobile
     ? 0.8
-    : isXxsTablet
-      ? -0.5
-      : isXsTablet
-        ? -0.5
-        : isSmallTablet
-          ? -0.5
-          : isLargeTablet
-            ? -0.6
-            : isTablet
-              ? -0.55
-              : -0.6;
+    : isTablet
+      ? lerp(600, 1199, -0.4, -0.6, vw)
+      : -0.6;
   const elexirScale = isMobile
-    ? 9
-    : isSmallTablet
-      ? 9
-      : isLargeTablet
-        ? 12.5
-        : isTablet
-          ? 11
-          : 14;
+    ? lerp(320, 599, 7, 9, vw)
+    : isTablet
+      ? lerp(600, 1199, 9, 13, vw)
+      : 14;
 
   const cusocietyModel = useGLTF(IPHONE_MODELS[0]);
   const elexirModel = useGLTF(IPHONE_MODELS[1]);
@@ -170,7 +140,11 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
     // CUSociety: hold at initialScale
     // Elexir: transition to elexirScale
     // Kiyo: grow to kiyoScale
-    const kiyoScale = isMobile ? 11 : isSmallTablet ? 13 : isTablet ? 16 : 20;
+    const kiyoScale = isMobile
+      ? lerp(320, 599, 9, 11, vw)
+      : isTablet
+        ? lerp(600, 1199, 13, 17, vw)
+        : 20;
     tl.current.fromTo(
       groupRef.current.scale,
       { x: initialScale, y: initialScale, z: initialScale },
@@ -270,11 +244,11 @@ export const ScrollScene = ({ scrollProgressRef }: ScrollSceneProps) => {
     initialScale,
     isMobile,
     isSmallScreen,
-    isSmallTablet,
     isTablet,
     elexirX,
     elexirY,
     elexirScale,
+    vw,
   ]);
 
   return (

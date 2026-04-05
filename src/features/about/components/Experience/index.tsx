@@ -4,7 +4,7 @@ import { Environment, OrbitControls } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useAtomValue } from "jotai";
 import { easing } from "maath";
-import { Group } from "three";
+import { Group, Vector3 } from "three";
 
 import { pageAtom, pages } from "../../constants";
 import { Book } from "../Book";
@@ -23,24 +23,55 @@ type ExperienceProps = {
   paused?: boolean;
   baseScale?: number;
   cameraX?: number;
+  mobileSide?: "none" | "left" | "right" | "center";
 };
 
 // ─── Camera controller ───
 
-const CameraController = ({ isInteractive, paused, cameraX = 0.64 }: { isInteractive: boolean; paused?: boolean; cameraX?: number }) => {
+const CameraController = ({
+  isInteractive,
+  paused,
+  cameraX = 0.64,
+  mobileSide = "none",
+}: {
+  isInteractive: boolean;
+  paused?: boolean;
+  cameraX?: number;
+  mobileSide?: "none" | "left" | "right" | "center";
+}) => {
   const page = useAtomValue(pageAtom);
+  const lookAtTarget = useRef(new Vector3(cameraX, BOOK_REST_Y, 0));
 
   useFrame(({ camera, invalidate }, delta) => {
     if (paused) return;
     const hasOpenPages = isInteractive && page > 0;
-    const targetPos: [number, number, number] = hasOpenPages
-      ? [-0.5, 1, 4]
-      : [cameraX, 0, 4];
-    const lookAt: [number, number, number] = hasOpenPages
-      ? [0, BOOK_REST_Y, 0]
-      : [cameraX, BOOK_REST_Y, 0];
+
+    let targetPos: [number, number, number];
+    let targetLookAt: [number, number, number];
+
+    if (mobileSide === "left" && hasOpenPages) {
+      targetPos = [-0.75, 0, 4];
+      targetLookAt = [-0.75, BOOK_REST_Y, 0];
+    } else if (mobileSide === "right" && hasOpenPages) {
+      targetPos = [0.75, 0, 4];
+      targetLookAt = [0.75, BOOK_REST_Y, 0];
+    } else if (mobileSide === "center") {
+      // Mobile back cover — centered
+      targetPos = [-0.5, 0, 4];
+      targetLookAt = [-0.25, BOOK_REST_Y, 0];
+    } else if (hasOpenPages) {
+      // Desktop/tablet open book — camera moves up to look down at spread
+      targetPos = [-0.5, 1, 4];
+      targetLookAt = [0, BOOK_REST_Y, 0];
+    } else {
+      // Closed book — centered
+      targetPos = [cameraX, 0, 4];
+      targetLookAt = [cameraX, BOOK_REST_Y, 0];
+    }
+
     easing.damp3(camera.position, targetPos, 0.6, delta);
-    camera.lookAt(...lookAt);
+    easing.damp3(lookAtTarget.current, targetLookAt, 0.6, delta);
+    camera.lookAt(lookAtTarget.current);
     camera.updateProjectionMatrix();
     invalidate();
   });
@@ -154,10 +185,16 @@ export const Experience = ({
   paused,
   baseScale,
   cameraX,
+  mobileSide = "none",
 }: ExperienceProps) => {
   return (
     <>
-      <CameraController isInteractive={isInteractive} paused={paused} cameraX={cameraX} />
+      <CameraController
+        isInteractive={isInteractive}
+        paused={paused}
+        cameraX={cameraX}
+        mobileSide={mobileSide}
+      />
 
       <BookEntrance
         isInteractive={isInteractive}
@@ -167,7 +204,10 @@ export const Experience = ({
         baseScale={baseScale}
       />
 
-      <OrbitControls enabled={isInteractive} enableZoom={false} />
+      <OrbitControls
+        enabled={isInteractive && mobileSide === "none"}
+        enableZoom={false}
+      />
 
       <Environment preset="studio" environmentIntensity={0.5} />
 
