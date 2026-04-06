@@ -32,7 +32,7 @@ export default function HomePage({ paused = false }: HomePageProps) {
       {/* Scroll budget for about animations (200vh = full interactivity range) */}
       <Box sx={{ height: "200dvh" }} />
       {/* Project: slides up and overlays about */}
-      <Box id="project-view" sx={{ position: "relative", top: 0, zIndex: 2 }}>
+      <Box id="project-view" sx={{ position: "relative", top: 0, zIndex: 2, transform: "translateZ(0)" }}>
         <ProjectView />
       </Box>
       <Box id="activity-view" sx={{ position: "sticky", top: 0, zIndex: 3 }}>

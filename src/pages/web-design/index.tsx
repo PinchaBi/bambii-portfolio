@@ -53,7 +53,7 @@ export default function WebDesignPage() {
 
   return (
     <>
-      <Stack>
+      <Stack sx={{ minHeight: "100dvh" }}>
         <PageLoading isLoading={isLoading} title="WEB DESIGN" />
         <Stack
           spacing={isShortScreen ? 1 : 2}
@@ -105,28 +105,16 @@ export default function WebDesignPage() {
           </Box>
         </Stack>
         <WebDesignView hiddenHeroId={hiddenHeroId} />
-        <Box height={isShortScreen ? "5vh" : "10vh"} display="flex" position="relative">
+        <Box px={{ xs: 3, sm: 6 }} sx={{ mt: "auto" }}>
           <Typography
-            bottom={0}
             variant="h2"
-            width="100vw"
-            position="absolute"
-            px={{ xs: 3, sm: 6 }}
             fontSize={isShortScreen ? 24 : { xs: 36, sm: 64 }}
           >
             WEB DESIGN
           </Typography>
         </Box>
         {!isShortScreen && (
-          <Box
-            pb={3}
-            left={0}
-            right={0}
-            bottom={0}
-            zIndex={0}
-            position="absolute"
-            px={{ xs: 3, sm: 6 }}
-          >
+          <Box px={{ xs: 3, sm: 6 }} pb={3}>
             <Footer />
           </Box>
         )}

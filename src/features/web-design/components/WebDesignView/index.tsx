@@ -10,14 +10,16 @@ type WebDesignViewProps = {
 
 const WebDesignView = ({ hiddenHeroId }: WebDesignViewProps) => {
   const isShortScreen = useMediaQuery("(max-height:500px)");
+  const isMobile = useMediaQuery("(max-width:599px)");
+  const isSmallTablet = useMediaQuery("(min-width:600px) and (max-width:899px)");
 
-  // On short/landscape screens, scale the entire list uniformly
-  const scale = isShortScreen ? 0.6 : 1;
+  // Scale the list to fit smaller screens
+  const scale = isShortScreen ? 0.6 : isMobile ? 0.65 : isSmallTablet ? 0.8 : 1;
 
   return (
     <Wrapper
-      height={isShortScreen ? "80vh" : "65vh"}
-      minHeight={isShortScreen ? "80vh" : "65vh"}
+      height={isShortScreen ? "80vh" : isMobile ? "55vh" : "65vh"}
+      minHeight={isShortScreen ? "80vh" : isMobile ? "55vh" : "65vh"}
       alignItems="flex-start"
       justifyContent="flex-start"
       sx={{
@@ -27,9 +29,10 @@ const WebDesignView = ({ hiddenHeroId }: WebDesignViewProps) => {
     >
       <Box
         sx={{
-          height: "100%",
-          transform: scale < 1 ? `scale(${scale})` : undefined,
-          transformOrigin: "bottom left",
+          height: scale < 1 ? `${100 / scale}%` : "100%",
+          display: "flex",
+          alignItems: "center",
+          zoom: scale < 1 ? scale : undefined,
         }}
       >
         <WebDesignList hiddenHeroId={hiddenHeroId} />

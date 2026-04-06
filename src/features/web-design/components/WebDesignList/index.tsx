@@ -37,11 +37,11 @@ const WebDesignList = ({ hiddenHeroId }: WebDesignListProps) => {
   return (
     <Stack
       pl={5}
-      pr={10}
+      pr={5}
       height="100%"
       direction="row"
       width="max-content"
-      alignItems="flex-end"
+      alignItems="center"
     >
       {Array.from({ length: ITEM_AMOUNT }).map((_, index) => {
         const {

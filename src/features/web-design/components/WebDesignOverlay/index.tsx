@@ -51,7 +51,6 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
         (vh * 0.5) / 500, // fit into top 50% of viewport
         1.2, // never exceed 1.2x even on huge tablets
       );
-
   const [enterSource] = useState<Rect | null>(() => consumeHeroRect());
   const [heroTarget, setHeroTarget] = useState<Rect | null>(null);
   const [displayAreaOrigin, setDisplayAreaOrigin] = useState<{
@@ -66,6 +65,7 @@ const WebDesignOverlay = ({ id }: WebDesignOverlayProps) => {
       document.body.style.overflow = "";
     };
   }, []);
+
 
   // Calculate bounding box of all items and center offset
   const [centerOffset, setCenterOffset] = useState({ x: 0, y: 0 });

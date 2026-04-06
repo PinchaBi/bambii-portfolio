@@ -174,6 +174,8 @@ const Grainient: React.FC<GrainientProps> = ({
     canvas.style.width = "100%";
     canvas.style.height = "100%";
     canvas.style.display = "block";
+    canvas.style.backfaceVisibility = "hidden";
+    canvas.style.transform = "translateZ(0)";
 
     const container = containerRef.current;
     container.appendChild(canvas);
